@@ -16,6 +16,8 @@ import java.util.ArrayList;
 
 public class ServerP2P extends Thread {
 
+    private final ArrayList<AsyncTask> handlers = new ArrayList<>();
+
     private boolean stop = false;
     private int port;
 
@@ -33,7 +35,7 @@ public class ServerP2P extends Thread {
             while(!stop) {
                 try {
                     Socket s = ss.accept();
-                    new HandlerPeer().execute(s);
+                   new HandlerPeer(this).execute(s);
                 } catch (SocketTimeoutException e) { }
             }
 
@@ -41,5 +43,9 @@ public class ServerP2P extends Thread {
             e.printStackTrace();
         }
 
+    }
+
+    public ArrayList<AsyncTask> getHandlers() {
+        return handlers;
     }
 }

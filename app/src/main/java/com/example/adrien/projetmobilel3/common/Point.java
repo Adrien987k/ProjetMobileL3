@@ -4,6 +4,8 @@ import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.nio.ByteBuffer;
+
 /**
  * Created by MrkJudge on 24/02/2017.
  */
@@ -26,13 +28,25 @@ public class Point implements Parcelable {
         this(x,y, Color.BLACK,1);
     }
 
-    //TODO vérifier l'ordre de lecture/écriture dans le parcel
-    public Point(Parcel parcel) {
+    private Point(byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.wrap(bytes);
+        this.x = buffer.getFloat();
+        this.y = buffer.getInt();
+        this.stroke = buffer.getInt();
+        this.color = buffer.getInt();
+    }
+
+    private Point(Parcel parcel) {
         this.x = parcel.readFloat();
         this.y = parcel.readFloat();
         this.stroke = parcel.readInt();
         this.color = parcel.readInt();
     }
+
+    public float getX() {return x;}
+    public float getY() {return y;}
+    public int getStroke() {return stroke;}
+    public int getColor() {return color;}
 
     public Parcelable.Creator<Point> CREATOR = new Parcelable.Creator<Point>() {
         @Override
@@ -59,19 +73,23 @@ public class Point implements Parcelable {
         dest.writeInt(color);
     }
 
-    public int getColor() {
-        return color;
-    }
-    public int getStroke() { return stroke;}
-    public float getX() {
-        return x;
-    }
-    public float getY() {
-        return y;
-    }
-
     public static int getByteLength() {
         return Float.SIZE *2 + Integer.SIZE *2;
+    }
+
+    public byte[] getBytes() {
+        ByteBuffer buffer = ByteBuffer.allocate(getByteLength());
+
+        buffer.putFloat(x);
+        buffer.putFloat(y);
+        buffer.putInt(stroke);
+        buffer.putInt(color);
+
+        return buffer.array();
+    }
+
+    public static Point getByBytes(byte[] bytes) {
+        return new Point(bytes);
     }
 
 }

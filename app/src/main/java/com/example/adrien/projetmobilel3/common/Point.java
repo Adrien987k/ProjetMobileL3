@@ -43,10 +43,10 @@ public class Point implements Parcelable {
         this.color = parcel.readInt();
     }
 
-    public float getX() {return x;}
-    public float getY() {return y;}
-    public int getStroke() {return stroke;}
-    public int getColor() {return color;}
+    public float getX() { return x; }
+    public float getY() { return y; }
+    public int getStroke() { return stroke; }
+    public int getColor() { return color; }
 
     public Parcelable.Creator<Point> CREATOR = new Parcelable.Creator<Point>() {
         @Override

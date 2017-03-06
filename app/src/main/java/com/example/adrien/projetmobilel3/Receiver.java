@@ -175,27 +175,39 @@ public class Receiver extends BroadcastReceiver {
                 wifiP2pManager.requestConnectionInfo(channel, new ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                        new AsyncTask<InetAddress,Object,Object>() {
-                            @Override
-                            protected Object doInBackground(InetAddress... params) {
-                                try {
+                                new AsyncTask<InetAddress, Object, Boolean>() {
+                                    @Override
+                                    protected Boolean doInBackground(InetAddress... params) {
+                                        try {
 
-                                    byte[] bytes;
-                                    DatagramSocket ds = new DatagramSocket();
-                                    DatagramPacket packet = new DatagramPacket((bytes = new byte[] {1,1,1,1,0})
-                                            ,bytes.length
-                                            ,params[0]
-                                            ,ServerP2P.DEFAULT_PORT);
-                                    ds.send(packet);
-                                    ds.close();
-                                } catch (SocketException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                return null;
-                            }
-                        }.execute(info.groupOwnerAddress);
+                                            byte[] bytes;
+                                            Socket socket = new Socket(params[0],ServerP2P.DEFAULT_PORT);
+                                            socket.getOutputStream().write(new byte[] {1,1});
+                                /*
+                                DatagramSocket ds = new DatagramSocket();
+                                DatagramPacket packet = new DatagramPacket((bytes = new byte[]{1, 1, 1, 1, 0})
+                                        , bytes.length
+                                        , params[0]
+                                        , ServerP2P.DEFAULT_PORT);
+                                ds.send(packet);
+                                ds.close();*/
+
+                                            socket.getInputStream().read(new byte[1]);
+                                            return true;
+                                        } catch (SocketException e) {
+                                            e.printStackTrace();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        return false;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Boolean aBoolean) {
+                                        super.onPostExecute(aBoolean);
+                                        mainActivity.isSent(aBoolean);
+                                    }
+                                }.execute(info.groupOwnerAddress);
                 }
             });
         }

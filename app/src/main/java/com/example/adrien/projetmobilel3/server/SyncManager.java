@@ -24,7 +24,7 @@ public class SyncManager extends AsyncTask<ArrayList<HandlerPeer>,ArrayList<Poin
     @Override
     protected String doInBackground(ArrayList<HandlerPeer>... params) {
         //TODO non terminé
-        this.handlers = new ArrayList<>(params[0]);
+        this.handlers = params[0];
         this.points = new ArrayList<>();
 
         while(!stop) {

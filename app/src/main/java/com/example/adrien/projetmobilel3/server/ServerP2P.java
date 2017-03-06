@@ -1,8 +1,6 @@
 package com.example.adrien.projetmobilel3.server;
 
-import android.os.AsyncTask;
-
-import com.example.adrien.projetmobilel3.common.Point;
+import com.example.adrien.projetmobilel3.MainActivity;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -16,13 +14,24 @@ import java.util.ArrayList;
 
 public class ServerP2P extends Thread {
 
-    private final ArrayList<AsyncTask> handlers = new ArrayList<>();
+    public static final int DEFAULT_PORT = 47856;
+
+    private final ArrayList<HandlerPeer> handlers = new ArrayList<>();
 
     private boolean stop = false;
     private int port;
 
-    public ServerP2P(int port) {
+    private MainActivity mainActivity;
+
+    public ServerP2P(MainActivity mainActivity, int port) {
         this.port = port;
+        this.mainActivity = mainActivity;
+        start();
+    }
+
+    public ServerP2P(MainActivity activity) {
+        this.port = DEFAULT_PORT ;
+        this.mainActivity = activity;
         start();
     }
 
@@ -35,7 +44,7 @@ public class ServerP2P extends Thread {
             while(!stop) {
                 try {
                     Socket s = ss.accept();
-                   new HandlerPeer(this).execute(s);
+                   new HandlerPeer(this,s).start();
                 } catch (SocketTimeoutException e) { }
             }
 
@@ -45,7 +54,11 @@ public class ServerP2P extends Thread {
 
     }
 
-    public ArrayList<AsyncTask> getHandlers() {
+    public ArrayList<HandlerPeer> getHandlers() {
         return handlers;
+    }
+
+    public MainActivity getMainActivity() {
+        return mainActivity;
     }
 }

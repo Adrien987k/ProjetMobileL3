@@ -31,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
@@ -44,8 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
         final WifiP2pManager.ActionListener discoverPeersListener = new WifiP2pManager.ActionListener() {
             @Override
-            public void onSuccess() {
-            }
+            public void onSuccess() {}
 
             @Override
             public void onFailure(int reason) {
@@ -71,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void isSent(boolean isSent) {
+
         if(isSent) {
             ((TextView) findViewById(R.id.sendStatus)).setText("Sent");
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -94,12 +96,6 @@ public class MainActivity extends AppCompatActivity {
     public void onPause(){
         super.onPause();
         unregisterReceiver(receiver);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        wifiP2pManager.clearLocalServices(channel,null);
     }
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled){

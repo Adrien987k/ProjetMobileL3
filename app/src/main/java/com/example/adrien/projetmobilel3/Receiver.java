@@ -79,60 +79,62 @@ public class Receiver extends BroadcastReceiver {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
             InetAddress groupOwnerAddress = null;
-            try {
-                groupOwnerAddress = InetAddress.getByName(info.groupOwnerAddress.getHostAddress());
-            } catch (UnknownHostException e) {
-                e.printStackTrace();
-            }
-            if(info.groupFormed && info.isGroupOwner){
-                Toast.makeText(mainActivity, "Group owner", Toast.LENGTH_SHORT).show();
-                ServerP2P server = new ServerP2P(mainActivity);
-                // Do whatever tasks are specific to the group owner.
-                // One common case is creating a group owner thread and accepting
-                // incoming connections.
-            } else if(info.groupFormed){
-                Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
-                if(groupOwnerAddress != null) {
-                    new AsyncTask<InetAddress, Object, Boolean>() {
-                        @Override
-                        protected Boolean doInBackground(InetAddress... params) {
-                            try {
-
-                                byte[] bytes;
-                                Socket socket = new Socket(params[0],ServerP2P.DEFAULT_PORT);
-                                socket.getOutputStream().write(new byte[] {1,1});
-                                /*
-                                DatagramSocket ds = new DatagramSocket();
-                                DatagramPacket packet = new DatagramPacket((bytes = new byte[]{1, 1, 1, 1, 0})
-                                        , bytes.length
-                                        , params[0]
-                                        , ServerP2P.DEFAULT_PORT);
-                                ds.send(packet);
-                                ds.close();*/
-
-                                socket.getInputStream().read(new byte[1]);
-                                return true;
-                            } catch (SocketException e) {
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            return false;
-                        }
-
-                        @Override
-                        protected void onPostExecute(Boolean aBoolean) {
-                            super.onPostExecute(aBoolean);
-                            mainActivity.isSent(aBoolean);
-                        }
-                    }.execute(groupOwnerAddress);
-                } else {
-                    AlertDialog.Builder alert = new AlertDialog.Builder(mainActivity);
-                    alert.setTitle("Unknown Address").show();
+            if(info.groupFormed) {
+                try {
+                    groupOwnerAddress = InetAddress.getByName(info.groupOwnerAddress.getHostAddress());
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
                 }
-                // The other device acts as the peer (client). In this case,
-                // you'll want to create a peer thread that connects
-                // to the group owner.
+                if(info.isGroupOwner){
+                    Toast.makeText(mainActivity, "Group owner", Toast.LENGTH_SHORT).show();
+                    ServerP2P server = new ServerP2P(mainActivity);
+                    // Do whatever tasks are specific to the group owner.
+                    // One common case is creating a group owner thread and accepting
+                    // incoming connections.
+                } else {
+                    Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
+                    if (groupOwnerAddress != null) {
+                        new AsyncTask<InetAddress, Object, Boolean>() {
+                            @Override
+                            protected Boolean doInBackground(InetAddress... params) {
+                                try {
+
+                                    byte[] bytes;
+                                    Socket socket = new Socket(params[0], ServerP2P.DEFAULT_PORT);
+                                    socket.getOutputStream().write(new byte[]{1, 1});
+                                    /*
+                                    DatagramSocket ds = new DatagramSocket();
+                                    DatagramPacket packet = new DatagramPacket((bytes = new byte[]{1, 1, 1, 1, 0})
+                                            , bytes.length
+                                            , params[0]
+                                            , ServerP2P.DEFAULT_PORT);
+                                    ds.send(packet);
+                                    ds.close();*/
+
+                                    socket.getInputStream().read(new byte[1]);
+                                    return true;
+                                } catch (SocketException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                return false;
+                            }
+
+                            @Override
+                            protected void onPostExecute(Boolean aBoolean) {
+                                super.onPostExecute(aBoolean);
+                                mainActivity.isSent(aBoolean);
+                            }
+                        }.execute(groupOwnerAddress);
+                    } else {
+                        AlertDialog.Builder alert = new AlertDialog.Builder(mainActivity);
+                        alert.setTitle("Unknown Address").show();
+                    }
+                    // The other device acts as the peer (client). In this case,
+                    // you'll want to create a peer thread that connects
+                    // to the group owner.
+                }
             }
         }
     };

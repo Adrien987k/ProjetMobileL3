@@ -10,8 +10,56 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.adrien.projetmobilel3.MainActivity">
 
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/peersList"
+        android:layout_marginTop="42dp"
+        android:layout_below="@+id/group_info_button"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:text="Discover"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/discover_button"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="25dp" />
+
+    <Button
+        android:text="Connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/connect_button"
+        android:layout_alignBaseline="@+id/discover_button"
+        android:layout_alignBottom="@+id/discover_button"
+        android:layout_toEndOf="@+id/discover_button"
+        android:layout_marginStart="62dp" />
+
+    <Button
+        android:text="Group info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/group_info_button"
+        android:layout_marginTop="35dp"
+        android:layout_below="@+id/discover_button"
+        android:layout_alignStart="@+id/discover_button" />
+
+    <Button
+        android:text="Send to Group Owner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/send_to_group_owner"
+        android:layout_alignBaseline="@+id/group_info_button"
+        android:layout_alignBottom="@+id/group_info_button"
+        android:layout_toEndOf="@+id/group_info_button" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:layout_below="@+id/send_to_group_owner"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/sendStatus" />
 </RelativeLayout>

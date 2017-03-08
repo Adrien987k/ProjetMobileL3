@@ -15,25 +15,30 @@ import java.util.ArrayList;
 public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayList<Point>,String> implements PointTransmission{
 
     private ArrayList<HandlerPeer> handlers;
-    private ArrayList<Point> points;
-
+    private final ArrayList<Point> points = new ArrayList<>();
+    private ServerP2P server;
     public static final int REFRESH_RATE = 100;
 
     private boolean stop = false;
+
+    public PointSynchronizer(ServerP2P server) {
+        this.server = server;
+    }
 
     @Override
     protected String doInBackground(ArrayList<HandlerPeer>... params) {
         //TODO non terminé
         this.handlers = params[0];
-        this.points = new ArrayList<>();
 
         while(!stop) {
             try {
                 Thread.sleep(100);
                 gatherPoints();
+                ArrayList<Point> knownPoints = new ArrayList<>(getPoints());
+                for(HandlerPeer handler: handlers) {
+                    handler.sendPoints(knownPoints);
+                }
 
-                //TODO envoie par intent (ou autre) des points
-                //TODO choisir si on garde tous les points ou non
 
             } catch (InterruptedException e) {}
         }

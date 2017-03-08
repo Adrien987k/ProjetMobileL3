@@ -1,8 +1,10 @@
 package com.example.adrien.projetmobilel3.client;
 
 import android.content.Context;
+import android.drm.DrmStore;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
+import android.os.AsyncTask;
 
 import com.example.adrien.projetmobilel3.MainActivity;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
@@ -14,6 +16,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.concurrent.ThreadFactory;
 
 /**
@@ -51,17 +54,38 @@ public class ClientPeer extends Thread implements PointTransmission {
                 return;
             }
 
+            new AsyncTask<Socket,Object,Object>() {
+
+                @Override
+                protected Object doInBackground(Socket... params) {
+
+                    Socket socket = params[0];
+                    while(true) {
+                        try {
+                            if (getPoints().size() > 0) {
+
+                                ArrayList<Point> knownPoints = new ArrayList<>(getPoints());
+                                for (Point p : knownPoints) {
+                                    socket.getOutputStream().write(p.getBytes());
+                                }
+
+
+                                getPoints().clear();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.execute(new Socket[] {socket});
+
             while(!stop) {
                 try {
-                    if(getPoints().size() > 0) {
 
-                        ArrayList<Point> knownPoints = new ArrayList<>(getPoints());
-                        for (Point p : knownPoints) {
-                                socket.getOutputStream().write(p.getBytes());
-                        }
+                    byte[] buffer = new byte[Point.getByteLength()];
+                    socket.getInputStream().read(buffer);
+                    mainActivity.getDraw().addPoint(new Point(buffer));
 
-                        getPoints().clear();
-                    }
                 } catch (SocketException e) {
                     e.printStackTrace();
                 } catch (IOException e) {

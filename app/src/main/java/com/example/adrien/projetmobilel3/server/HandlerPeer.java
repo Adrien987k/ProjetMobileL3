@@ -26,10 +26,7 @@ public class HandlerPeer extends Thread {
 
     private ServerP2P server;
     private Socket socket;
-    private OutputStream os;
-
     private boolean stop = false;
-    private int pointPacketLenght = Point.getByteLength();
     private final ArrayList<Point> points = new ArrayList<>();
 
     public HandlerPeer(ServerP2P server,Socket socket) {
@@ -44,7 +41,6 @@ public class HandlerPeer extends Thread {
         nm.notify(0,builder.build());
     }
 
-    public OutputStream getOutPutSteam() { return os; }
     public ArrayList<Point> getPoints() { return points; }
     public synchronized ArrayList<Point> gatherPoints() {
         ArrayList<Point> pointsGathered = new ArrayList<>(getPoints());
@@ -57,7 +53,6 @@ public class HandlerPeer extends Thread {
         super.run();
 
         try {
-            os = socket.getOutputStream();
             InputStream buffer = socket.getInputStream();
 
             while(!stop) {
@@ -67,18 +62,6 @@ public class HandlerPeer extends Thread {
                 Point p = new Point(bufferData);
                 server.getMainActivity().getDraw().addPoint(p);
 
-                NotificationCompat.Builder builder = new NotificationCompat.Builder(server.getMainActivity());
-                builder.setContentTitle("Message received")
-                .setContentText("Message received from socket")
-                .setSmallIcon(R.drawable.message_received);
-                NotificationManager nm = (NotificationManager) server.getMainActivity().getSystemService(NOTIFICATION_SERVICE);
-                nm.notify(0,builder.build());
-
-                os.write(new byte[] {1,0});
-
-                //buffer.read(new byte[pointPacketLenght], 0, pointPacketLenght);
-                //TODO méthode de déserialization + envoie des données vers l'application
-
             }
             socket.close();
             points.clear();
@@ -87,5 +70,15 @@ public class HandlerPeer extends Thread {
         }
 
         server.getHandlers().remove(this);
+    }
+
+    public synchronized void sendPoints(ArrayList<Point> points) {
+        for(Point point: points) {
+            try {
+                socket.getOutputStream().write(point.getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

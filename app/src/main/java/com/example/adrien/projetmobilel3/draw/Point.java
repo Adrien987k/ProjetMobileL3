@@ -1,4 +1,4 @@
-package com.example.adrien.projetmobilel3.common;
+package com.example.adrien.projetmobilel3.draw;
 
 import android.graphics.Color;
 import android.os.Parcel;
@@ -40,10 +40,10 @@ public class Point implements Parcelable {
         this(x,y, Color.BLACK,1);
     }
 
-    private Point(byte[] bytes) {
+    public Point(byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         this.x = buffer.getFloat();
-        this.y = buffer.getInt();
+        this.y = buffer.getFloat();
         this.stroke = buffer.getInt();
         this.color = buffer.getInt();
     }
@@ -92,4 +92,8 @@ public class Point implements Parcelable {
         return new Point(bytes);
     }
 
+    @Override
+    public String toString() {
+        return "(" + x + "," + y + ")" + " stroke: " + stroke + " color: " + color;
+    }
 }

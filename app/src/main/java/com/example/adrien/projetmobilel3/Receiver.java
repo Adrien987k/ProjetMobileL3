@@ -1,9 +1,13 @@
 package com.example.adrien.projetmobilel3;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
+import android.net.ConnectivityManager;
+import android.net.Network;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -16,6 +20,7 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 //import android.util.Log;
 import android.os.AsyncTask;
+import android.support.v7.app.NotificationCompat;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -23,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
 import java.io.IOException;
@@ -35,6 +41,9 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static android.content.Context.NOTIFICATION_SERVICE;
+import static android.net.ConnectivityManager.TYPE_WIFI;
 
 /**
  * Created by Adrien on 20/02/2017.
@@ -78,13 +87,7 @@ public class Receiver extends BroadcastReceiver {
     private ConnectionInfoListener connectionInfoListener = new ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-            InetAddress groupOwnerAddress = null;
             if(info.groupFormed) {
-                try {
-                    groupOwnerAddress = InetAddress.getByName(info.groupOwnerAddress.getHostAddress());
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                }
                 if(info.isGroupOwner){
                     Toast.makeText(mainActivity, "Group owner", Toast.LENGTH_SHORT).show();
                     ServerP2P server = new ServerP2P(mainActivity);
@@ -93,44 +96,6 @@ public class Receiver extends BroadcastReceiver {
                     // incoming connections.
                 } else {
                     Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
-                    if (groupOwnerAddress != null) {
-                        new AsyncTask<InetAddress, Object, Boolean>() {
-                            @Override
-                            protected Boolean doInBackground(InetAddress... params) {
-                                try {
-
-                                    byte[] bytes;
-                                    Socket socket = new Socket(params[0], ServerP2P.DEFAULT_PORT);
-                                    socket.getOutputStream().write(new byte[]{1, 1});
-                                    /*
-                                    DatagramSocket ds = new DatagramSocket();
-                                    DatagramPacket packet = new DatagramPacket((bytes = new byte[]{1, 1, 1, 1, 0})
-                                            , bytes.length
-                                            , params[0]
-                                            , ServerP2P.DEFAULT_PORT);
-                                    ds.send(packet);
-                                    ds.close();*/
-
-                                    socket.getInputStream().read(new byte[1]);
-                                    return true;
-                                } catch (SocketException e) {
-                                    e.printStackTrace();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-                                return false;
-                            }
-
-                            @Override
-                            protected void onPostExecute(Boolean aBoolean) {
-                                super.onPostExecute(aBoolean);
-                                mainActivity.isSent(aBoolean);
-                            }
-                        }.execute(groupOwnerAddress);
-                    } else {
-                        AlertDialog.Builder alert = new AlertDialog.Builder(mainActivity);
-                        alert.setTitle("Unknown Address").show();
-                    }
                     // The other device acts as the peer (client). In this case,
                     // you'll want to create a peer thread that connects
                     // to the group owner.
@@ -148,23 +113,27 @@ public class Receiver extends BroadcastReceiver {
 
     }
 
-
+    //TODO: boutons à enlever
+    // mais pratique pour tester rapidement
     private void buttons() {
         Button groupInfoButton = (Button) mainActivity.findViewById(R.id.group_info_button);
         groupInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                wifiP2pManager.requestGroupInfo(mainActivity.channel, new WifiP2pManager.GroupInfoListener() {
+                wifiP2pManager.requestGroupInfo(mainActivity.getChannel(), new WifiP2pManager.GroupInfoListener() {
                     @Override
                     public void onGroupInfoAvailable(WifiP2pGroup group) {
-                        ListView lv = (ListView) mainActivity.findViewById(R.id.peersList);
-                        ArrayAdapter<WifiP2pDevice> aas = new ArrayAdapter<>(mainActivity,R.layout.peer_item_adapter);
-                        ArrayAdapter<String> as = new ArrayAdapter<>(mainActivity,R.layout.peer_item_adapter);
-                        lv.setAdapter(as);
-                        as.add("Group: " + group);
-                        as.add("Group owner: "+ group.getOwner().deviceName + " -- " + group.getOwner().deviceAddress);
-                        for(WifiP2pDevice device:peers)
-                            as.add(device.deviceName);
+                        if (group != null) {
+                            ListView lv = (ListView) mainActivity.findViewById(R.id.peersList);
+                            ArrayAdapter<WifiP2pDevice> aas = new ArrayAdapter<>(mainActivity, R.layout.peer_item_adapter);
+                            ArrayAdapter<String> as = new ArrayAdapter<>(mainActivity, R.layout.peer_item_adapter);
+                            lv.setAdapter(as);
+                            as.add("Group owner: " + group.getOwner().deviceName + " -- " + group.getOwner().deviceAddress);
+                            for (WifiP2pDevice device : peers)
+                                as.add(device.deviceName);
+                        } else {
+                            Toast.makeText(mainActivity,"You're not part of a group", Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }
@@ -177,29 +146,26 @@ public class Receiver extends BroadcastReceiver {
                 wifiP2pManager.requestConnectionInfo(channel, new ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                                new AsyncTask<InetAddress, Object, Boolean>() {
+                        ((TextView) mainActivity.findViewById(R.id.sendStatus)).setText("...");
+                        new AsyncTask<InetAddress, Object, Boolean>() {
                                     @Override
                                     protected Boolean doInBackground(InetAddress... params) {
-                                        try {
-
-                                            byte[] bytes;
-                                            Socket socket = new Socket(params[0],ServerP2P.DEFAULT_PORT);
-                                            socket.getOutputStream().write(new byte[] {1,1});
-                                /*
-                                DatagramSocket ds = new DatagramSocket();
-                                DatagramPacket packet = new DatagramPacket((bytes = new byte[]{1, 1, 1, 1, 0})
-                                        , bytes.length
-                                        , params[0]
-                                        , ServerP2P.DEFAULT_PORT);
-                                ds.send(packet);
-                                ds.close();*/
-
-                                            socket.getInputStream().read(new byte[1]);
-                                            return true;
-                                        } catch (SocketException e) {
-                                            e.printStackTrace();
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
+                                        ConnectivityManager cm = (ConnectivityManager) (mainActivity.getSystemService(Context.CONNECTIVITY_SERVICE));
+                                        if(cm != null
+                                            && cm.getActiveNetworkInfo().isConnected())  {
+                                            try {
+                                                byte[] bytes;
+                                                Socket socket = new Socket(params[0], ServerP2P.DEFAULT_PORT);
+                                                Point point = new Point(30,30,50, Color.RED);
+                                                socket.getOutputStream().write(point.getBytes());
+                                                socket.getInputStream().read(new byte[1]);
+                                                socket.close();
+                                                return true;
+                                            } catch (SocketException e) {
+                                                e.printStackTrace();
+                                            } catch (IOException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
                                         return false;
                                     }
@@ -207,7 +173,17 @@ public class Receiver extends BroadcastReceiver {
                                     @Override
                                     protected void onPostExecute(Boolean aBoolean) {
                                         super.onPostExecute(aBoolean);
-                                        mainActivity.isSent(aBoolean);
+                                        if(aBoolean) {
+                                            ((TextView) mainActivity.findViewById(R.id.sendStatus)).setText("Sent");
+                                            NotificationCompat.Builder builder = new NotificationCompat.Builder(mainActivity);
+                                            builder.setContentTitle("Message received")
+                                                    .setContentText("Message received from the server")
+                                                    .setSmallIcon(R.drawable.message_received);
+                                            NotificationManager nm = (NotificationManager) mainActivity.getSystemService(NOTIFICATION_SERVICE);
+                                            nm.notify(0, builder.build());
+                                        } else {
+                                            ((TextView) mainActivity.findViewById(R.id.sendStatus)).setText("Not sent ");
+                                        }
                                     }
                                 }.execute(info.groupOwnerAddress);
                 }

@@ -1,22 +1,16 @@
 package com.example.adrien.projetmobilel3.server;
 
-import android.app.AlertDialog;
 import android.app.NotificationManager;
-import android.content.Intent;
-import android.os.AsyncTask;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
-import android.view.InputDevice;
 import android.widget.Toast;
 
-import com.example.adrien.projetmobilel3.MainActivity;
 import com.example.adrien.projetmobilel3.R;
-import com.example.adrien.projetmobilel3.common.Point;
+import com.example.adrien.projetmobilel3.draw.Point;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.reflect.Array;
 import java.net.Socket;
 import java.util.ArrayList;
 
@@ -67,7 +61,10 @@ public class HandlerPeer extends Thread {
 
             while(!stop) {
 
-                buffer.read(new byte[1]);
+                byte[] bufferData = new byte[Point.getByteLength()];
+                buffer.read(bufferData);
+                Point p = new Point(bufferData);
+                server.getMainActivity().getDraw().addPoint(p);
 
                 NotificationCompat.Builder builder = new NotificationCompat.Builder(server.getMainActivity());
                 builder.setContentTitle("Message received")

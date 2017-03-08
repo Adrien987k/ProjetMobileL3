@@ -5,6 +5,7 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.wifi.WpsInfo;
@@ -27,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
 import java.io.IOException;
@@ -118,7 +120,7 @@ public class Receiver extends BroadcastReceiver {
         groupInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                wifiP2pManager.requestGroupInfo(mainActivity.channel, new WifiP2pManager.GroupInfoListener() {
+                wifiP2pManager.requestGroupInfo(mainActivity.getChannel(), new WifiP2pManager.GroupInfoListener() {
                     @Override
                     public void onGroupInfoAvailable(WifiP2pGroup group) {
                         if (group != null) {
@@ -126,7 +128,6 @@ public class Receiver extends BroadcastReceiver {
                             ArrayAdapter<WifiP2pDevice> aas = new ArrayAdapter<>(mainActivity, R.layout.peer_item_adapter);
                             ArrayAdapter<String> as = new ArrayAdapter<>(mainActivity, R.layout.peer_item_adapter);
                             lv.setAdapter(as);
-                            as.add("Group: " + group);
                             as.add("Group owner: " + group.getOwner().deviceName + " -- " + group.getOwner().deviceAddress);
                             for (WifiP2pDevice device : peers)
                                 as.add(device.deviceName);
@@ -155,7 +156,8 @@ public class Receiver extends BroadcastReceiver {
                                             try {
                                                 byte[] bytes;
                                                 Socket socket = new Socket(params[0], ServerP2P.DEFAULT_PORT);
-                                                socket.getOutputStream().write(new byte[]{1, 1});
+                                                Point point = new Point(30,30,50, Color.RED);
+                                                socket.getOutputStream().write(point.getBytes());
                                                 socket.getInputStream().read(new byte[1]);
                                                 socket.close();
                                                 return true;

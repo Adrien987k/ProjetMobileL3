@@ -1,9 +1,8 @@
 package com.example.adrien.projetmobilel3.server;
 
 import android.os.AsyncTask;
-import android.widget.EditText;
 
-import com.example.adrien.projetmobilel3.common.Point;
+import com.example.adrien.projetmobilel3.draw.Point;
 
 import java.util.ArrayList;
 

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
@@ -21,7 +22,7 @@ import static android.content.Context.NOTIFICATION_SERVICE;
  * Created by MrkJudge on 24/02/2017.
  */
 
-//TODO non terminé + discuter de l'AsyncTask ou Thread
+//TODO non terminé
 public class HandlerPeer extends Thread {
 
     private ServerP2P server;
@@ -51,11 +52,10 @@ public class HandlerPeer extends Thread {
     @Override
     public void run() {
         super.run();
-
         try {
             InputStream buffer = socket.getInputStream();
 
-            while(!stop) {
+            while (!stop) {
 
                 byte[] bufferData = new byte[Point.getByteLength()];
                 buffer.read(bufferData);
@@ -63,22 +63,34 @@ public class HandlerPeer extends Thread {
                 server.getMainActivity().getDraw().addPoint(p);
 
             }
-            socket.close();
             points.clear();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        server.getHandlers().remove(this);
-    }
-
-    public synchronized void sendPoints(ArrayList<Point> points) {
-        for(Point point: points) {
+        } catch (SocketException se) {
             try {
-                socket.getOutputStream().write(point.getBytes());
+                server.getHandlers().remove(this);
+                socket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public synchronized void sendPoints(ArrayList<Point> points) {
+        try {
+            for (Point point : points) {
+                socket.getOutputStream().write(point.getBytes());
+            }
+        } catch (SocketException se) {
+            try {
+                server.getHandlers().remove(this);
+                socket.close();
+                stop = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

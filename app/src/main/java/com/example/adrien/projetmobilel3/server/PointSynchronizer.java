@@ -5,14 +5,16 @@ import android.os.AsyncTask;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Point;
 
+import java.lang.reflect.Array;
+import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
  * Created by MrkJudge on 25/02/2017.
  */
 
-//TODO non terminé + discuter de l'AsyncTask ou Thread
-public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayList<Point>,String> implements PointTransmission{
+//TODO non terminé
+public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayList<Point>,Boolean> implements PointTransmission{
 
     private ArrayList<HandlerPeer> handlers;
     private final ArrayList<Point> points = new ArrayList<>();
@@ -26,7 +28,7 @@ public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayLis
     }
 
     @Override
-    protected String doInBackground(ArrayList<HandlerPeer>... params) {
+    protected Boolean doInBackground(ArrayList<HandlerPeer>... params) {
         //TODO non terminé
         this.handlers = params[0];
 
@@ -34,27 +36,29 @@ public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayLis
             try {
                 Thread.sleep(100);
                 gatherPoints();
-                ArrayList<Point> knownPoints = new ArrayList<>(getPoints());
-                for(HandlerPeer handler: handlers) {
-                    handler.sendPoints(knownPoints);
+
+                synchronized (points) {
+                    ArrayList<Point> knownPoints = new ArrayList<>(points);
+                    ArrayList<HandlerPeer> knownHandlers = new ArrayList<>(handlers);
+                    for (HandlerPeer handler : knownHandlers) {
+                        handler.sendPoints(knownPoints);
+                    }
+                    points.clear();
                 }
 
-
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
 
-        return null;
+        return true;
     }
 
-    @Override
-    protected void onProgressUpdate(ArrayList<Point>... values) {
-        super.onProgressUpdate(values);
-        //TODO non commencé
-    }
-
-    private synchronized void gatherPoints() {
-        for(HandlerPeer handler: handlers) {
-            getPoints().addAll(handler.gatherPoints());
+    private synchronized void gatherPoints(){
+        synchronized (handlers) {
+            for (HandlerPeer handler : handlers) {
+                getPoints().addAll(handler.gatherPoints());
+            }
         }
     }
 

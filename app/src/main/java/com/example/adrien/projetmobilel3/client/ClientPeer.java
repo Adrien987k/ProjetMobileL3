@@ -54,13 +54,13 @@ public class ClientPeer extends Thread implements PointTransmission {
                 return;
             }
 
-            new AsyncTask<Socket,Object,Object>() {
+            new AsyncTask<Socket,Object,Boolean>() {
 
                 @Override
-                protected Object doInBackground(Socket... params) {
+                protected Boolean doInBackground(Socket... params) {
 
                     Socket socket = params[0];
-                    while(true) {
+                    while(!isStop()) {
                         try {
                             if (getPoints().size() > 0) {
 
@@ -68,14 +68,16 @@ public class ClientPeer extends Thread implements PointTransmission {
                                 for (Point p : knownPoints) {
                                     socket.getOutputStream().write(p.getBytes());
                                 }
-
-
                                 getPoints().clear();
                             }
+                        } catch(SocketException e) {
+                            e.printStackTrace();
+                            stop = true;
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     }
+                    return true;
                 }
             }.execute(new Socket[] {socket});
 
@@ -88,19 +90,16 @@ public class ClientPeer extends Thread implements PointTransmission {
 
                 } catch (SocketException e) {
                     e.printStackTrace();
+                    stop = true;
                 } catch (IOException e) {
                     e.printStackTrace();
-                    return;
-                } finally {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
                 }
-
             }
         }
+    }
+
+    private boolean isStop() {
+        return stop;
     }
 
     private ArrayList<Point> getPoints() {
@@ -117,3 +116,4 @@ public class ClientPeer extends Thread implements PointTransmission {
         getPoints().addAll(points);
     }
 }
+

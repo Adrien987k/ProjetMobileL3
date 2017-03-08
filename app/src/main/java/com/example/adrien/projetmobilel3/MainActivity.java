@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Draw draw;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +55,10 @@ public class MainActivity extends AppCompatActivity {
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
         receiver = new Receiver(wifiP2pManager, channel, this);
+
+
+
+        wifiP2pManager.discoverPeers(channel,receiver.discoverThenConnect);
 
 
         //TODO: boutons à enlever
@@ -137,11 +142,14 @@ public class MainActivity extends AppCompatActivity {
             ( (TextView) findViewById(R.id.sendStatus)).setText("Not sent");
     }
 */
+
+    //TODO sauvegarde des données
     @Override
     public void onResume(){
         super.onResume();
         receiver = new Receiver(wifiP2pManager, channel, this);
         registerReceiver(receiver, intentFilter);
+        wifiP2pManager.discoverPeers(channel,receiver.discoverThenConnect);
         wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
@@ -151,6 +159,8 @@ public class MainActivity extends AppCompatActivity {
                         transmission = server.getSynchronizer();
                     } else
                         transmission = new ClientPeer(MainActivity.this,info.groupOwnerAddress);
+                } else {
+                    Toast.makeText(mainActivity, "reconnexion failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -164,6 +174,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled){
         this.isWifiP2pEnabled = isWifiP2pEnabled;
+    }
+
+    public void setTransmission(PointTransmission transmission) {
+        this.transmission = transmission;
     }
 
     public Channel getChannel() {

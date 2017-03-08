@@ -71,5 +71,6 @@ public class ServerP2P extends Thread {
     public PointSynchronizer getSynchronizer() {
         return synchronizer;
     }
+    
 
 }

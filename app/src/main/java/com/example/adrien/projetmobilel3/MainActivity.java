@@ -28,6 +28,8 @@ import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.PointSynchronizer;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
+//TODO L'application plante quand l'un se déconnecte
+
 public class MainActivity extends AppCompatActivity {
 
     private final IntentFilter intentFilter = new IntentFilter();

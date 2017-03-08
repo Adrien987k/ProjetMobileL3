@@ -1,6 +1,7 @@
 package com.example.adrien.projetmobilel3.server;
 
 import com.example.adrien.projetmobilel3.MainActivity;
+import com.example.adrien.projetmobilel3.common.PointTransmission;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -18,6 +19,8 @@ public class ServerP2P extends Thread {
 
     private final ArrayList<HandlerPeer> handlers = new ArrayList<>();
 
+    private PointSynchronizer synchronizer;
+
     private boolean stop = false;
     private int port;
 
@@ -26,13 +29,14 @@ public class ServerP2P extends Thread {
     public ServerP2P(MainActivity mainActivity, int port) {
         this.port = port;
         this.mainActivity = mainActivity;
+        this.synchronizer = new PointSynchronizer();
+
+        synchronizer.execute(handlers);
         start();
     }
 
-    public ServerP2P(MainActivity activity) {
-        this.port = DEFAULT_PORT ;
-        this.mainActivity = activity;
-        start();
+    public ServerP2P(MainActivity mainActivity) {
+        this(mainActivity,DEFAULT_PORT);
     }
 
     @Override
@@ -60,5 +64,9 @@ public class ServerP2P extends Thread {
 
     public MainActivity getMainActivity() {
         return mainActivity;
+    }
+
+    public PointSynchronizer getSynchronizer() {
+        return synchronizer;
     }
 }

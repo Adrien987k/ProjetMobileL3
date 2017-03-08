@@ -20,8 +20,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adrien.projetmobilel3.client.ClientPeer;
+import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
 import com.example.adrien.projetmobilel3.draw.Point;
+import com.example.adrien.projetmobilel3.server.PointSynchronizer;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,9 +32,12 @@ public class MainActivity extends AppCompatActivity {
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager wifiP2pManager = null;
     private Channel channel = null;
-    Receiver receiver = null;
+    private Receiver receiver = null;
+    private PointTransmission transmission;
+
     private boolean isWifiP2pEnabled = false;
     public final MainActivity mainActivity = this;
+
     private Draw draw;
 
     @Override
@@ -80,6 +86,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 ((Draw) v).addPoint(new Point(event.getX(),event.getY(),20, Color.BLUE));
+                transmission.addPoint(new Point(event.getX(),event.getY(),20, Color.RED));
                 v.invalidate();
                 return true;
             }
@@ -117,8 +124,13 @@ public class MainActivity extends AppCompatActivity {
         wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                if(info.groupFormed && info.isGroupOwner)
-                    new ServerP2P(MainActivity.this);
+                if(info.groupFormed) {
+                    if(info.isGroupOwner) {
+                        ServerP2P server = new ServerP2P(MainActivity.this);
+                        transmission = server.getSynchronizer();
+                    } else
+                        transmission = new ClientPeer(MainActivity.this,info.groupOwnerAddress);
+                }
             }
         });
     }

@@ -1,5 +1,6 @@
 package com.example.adrien.projetmobilel3.server;
 
+import android.app.Activity;
 import android.app.NotificationManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.NotificationCompat;
@@ -79,7 +80,8 @@ public class HandlerPeer extends Thread {
                 //TODO méthode de déserialization + envoie des données vers l'application
 
             }
-            socket.close();points.clear();
+            socket.close();
+            points.clear();
         } catch (IOException e) {
             e.printStackTrace();
         }

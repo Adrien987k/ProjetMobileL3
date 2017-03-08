@@ -2,6 +2,7 @@ package com.example.adrien.projetmobilel3.server;
 
 import android.os.AsyncTask;
 
+import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Point;
 
 import java.util.ArrayList;
@@ -11,7 +12,7 @@ import java.util.ArrayList;
  */
 
 //TODO non terminé + discuter de l'AsyncTask ou Thread
-public class SyncManager extends AsyncTask<ArrayList<HandlerPeer>,ArrayList<Point>,String> {
+public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayList<Point>,String> implements PointTransmission{
 
     private ArrayList<HandlerPeer> handlers;
     private ArrayList<Point> points;
@@ -46,9 +47,23 @@ public class SyncManager extends AsyncTask<ArrayList<HandlerPeer>,ArrayList<Poin
         //TODO non commencé
     }
 
-    private void gatherPoints() {
+    private synchronized void gatherPoints() {
         for(HandlerPeer handler: handlers) {
-            this.points.addAll(handler.gatherPoints());
+            getPoints().addAll(handler.gatherPoints());
         }
+    }
+
+    private ArrayList<Point> getPoints() {
+        return points;
+    }
+
+    @Override
+    public synchronized void addPoint(Point point) {
+        getPoints().add(point);
+    }
+
+    @Override
+    public synchronized void addAllPoints(ArrayList<Point> points) {
+        getPoints().addAll(points);
     }
 }

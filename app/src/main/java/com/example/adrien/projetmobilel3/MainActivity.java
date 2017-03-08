@@ -8,6 +8,7 @@ import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
@@ -99,6 +100,26 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.getDraw().invalidate();
             }
         });
+
+        //TODO à revoir probablement
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(true) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            draw.invalidate();
+                        }
+                    });
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
     }
 
     /*

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pGroup;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.example.adrien.projetmobilel3.server.ServerP2P;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,34 +34,31 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-
-
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
         receiver = new Receiver(wifiP2pManager, channel, this);
 
-        final WifiP2pManager.ActionListener discoverPeersListener = new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {}
 
-            @Override
-            public void onFailure(int reason) {
-                Toast.makeText(MainActivity.this, "Discover failed.", Toast.LENGTH_SHORT).show();
-            }
-        };
-
+        //TODO: boutons à enlever
+        // mais pratique pour tester rapidement
         Button discoverButton = (Button)findViewById(R.id.discover_button);
         discoverButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                wifiP2pManager.discoverPeers(channel, discoverPeersListener);
+                wifiP2pManager.discoverPeers(channel, new WifiP2pManager.ActionListener() {
+                    @Override
+                    public void onSuccess() {}
+
+                    @Override
+                    public void onFailure(int reason) {
+                        Toast.makeText(MainActivity.this, "Discover failed.", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
 
@@ -71,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /*
     public void isSent(boolean isSent) {
 
         if(isSent) {
@@ -84,12 +85,19 @@ public class MainActivity extends AppCompatActivity {
         } else
             ( (TextView) findViewById(R.id.sendStatus)).setText("Not sent");
     }
-
+*/
     @Override
     public void onResume(){
         super.onResume();
         receiver = new Receiver(wifiP2pManager, channel, this);
         registerReceiver(receiver, intentFilter);
+        wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
+            @Override
+            public void onConnectionInfoAvailable(WifiP2pInfo info) {
+                if(info.groupFormed && info.isGroupOwner)
+                    new ServerP2P(MainActivity.this);
+            }
+        });
     }
 
     @Override

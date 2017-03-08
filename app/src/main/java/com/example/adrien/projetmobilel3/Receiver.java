@@ -1,6 +1,7 @@
 package com.example.adrien.projetmobilel3;
 
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 //import android.util.Log;
 import android.os.AsyncTask;
+import android.support.v7.app.NotificationCompat;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -38,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
 import static android.net.ConnectivityManager.TYPE_WIFI;
 
 /**
@@ -82,13 +85,7 @@ public class Receiver extends BroadcastReceiver {
     private ConnectionInfoListener connectionInfoListener = new ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-            InetAddress groupOwnerAddress = null;
             if(info.groupFormed) {
-                try {
-                    groupOwnerAddress = InetAddress.getByName(info.groupOwnerAddress.getHostAddress());
-                } catch (UnknownHostException e) {
-                    e.printStackTrace();
-                }
                 if(info.isGroupOwner){
                     Toast.makeText(mainActivity, "Group owner", Toast.LENGTH_SHORT).show();
                     ServerP2P server = new ServerP2P(mainActivity);
@@ -114,7 +111,8 @@ public class Receiver extends BroadcastReceiver {
 
     }
 
-
+    //TODO: boutons à enlever
+    // mais pratique pour tester rapidement
     private void buttons() {
         Button groupInfoButton = (Button) mainActivity.findViewById(R.id.group_info_button);
         groupInfoButton.setOnClickListener(new View.OnClickListener() {
@@ -173,7 +171,17 @@ public class Receiver extends BroadcastReceiver {
                                     @Override
                                     protected void onPostExecute(Boolean aBoolean) {
                                         super.onPostExecute(aBoolean);
-                                        mainActivity.isSent(aBoolean);
+                                        if(aBoolean) {
+                                            ((TextView) mainActivity.findViewById(R.id.sendStatus)).setText("Sent");
+                                            NotificationCompat.Builder builder = new NotificationCompat.Builder(mainActivity);
+                                            builder.setContentTitle("Message received")
+                                                    .setContentText("Message received from the server")
+                                                    .setSmallIcon(R.drawable.message_received);
+                                            NotificationManager nm = (NotificationManager) mainActivity.getSystemService(NOTIFICATION_SERVICE);
+                                            nm.notify(0, builder.build());
+                                        } else {
+                                            ((TextView) mainActivity.findViewById(R.id.sendStatus)).setText("Not sent ");
+                                        }
                                     }
                                 }.execute(info.groupOwnerAddress);
                 }

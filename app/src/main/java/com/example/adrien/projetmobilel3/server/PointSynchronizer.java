@@ -36,14 +36,13 @@ public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayLis
             try {
                 Thread.sleep(100);
                 gatherPoints();
-
                 synchronized (points) {
                     ArrayList<Point> knownPoints = new ArrayList<>(points);
+                    points.clear();
                     ArrayList<HandlerPeer> knownHandlers = new ArrayList<>(handlers);
                     for (HandlerPeer handler : knownHandlers) {
                         handler.sendPoints(knownPoints);
                     }
-                    points.clear();
                 }
 
             } catch (InterruptedException e) {
@@ -60,6 +59,12 @@ public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayLis
                 getPoints().addAll(handler.gatherPoints());
             }
         }
+    }
+
+    @Override
+    public void setStop(boolean stop) {
+        this.stop = stop;
+        server.setStop(stop);
     }
 
     private ArrayList<Point> getPoints() {

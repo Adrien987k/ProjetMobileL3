@@ -43,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
 
     private Draw draw;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        wifiP2pManager.discoverPeers(channel,receiver.discoverThenConnect);
+        wifiP2pManager.discoverPeers(channel,receiver.discover);
 
 
         //TODO: boutons à enlever
@@ -105,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.this.getDraw().invalidate();
+                MainActivity.this.getDraw().getPoints().clear();
             }
         });
 
@@ -159,9 +158,11 @@ public class MainActivity extends AppCompatActivity {
                 if(info.groupFormed) {
                     if(info.isGroupOwner) {
                         ServerP2P server = new ServerP2P(MainActivity.this);
-                        transmission = server.getSynchronizer();
-                    } else
-                        transmission = new ClientPeer(MainActivity.this,info.groupOwnerAddress);
+                        setTransmission(server.getSynchronizer());
+                        setTransmission(server.getSynchronizer());
+                    } else {
+                     //   transmission = new ClientPeer(MainActivity.this, info.groupOwnerAddress);
+                    }
                 } else {
                     Toast.makeText(mainActivity, "reconnexion failed", Toast.LENGTH_SHORT).show();
                 }
@@ -172,7 +173,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onPause(){
         super.onPause();
+        setStop(true);
         unregisterReceiver(receiver);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        setStop(true);
     }
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled){
@@ -193,5 +201,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickPeerDiscovered(View v) {
         receiver.connect(((TextView) v).getText().toString());
+    }
+
+    private void setStop(boolean stop) {
+        transmission.setStop(stop);
     }
 }

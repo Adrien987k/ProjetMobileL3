@@ -11,4 +11,5 @@ import java.util.ArrayList;
 public interface PointTransmission {
     public void addPoint(Point point);
     public void addAllPoints(ArrayList<Point> points$);
+    public void setStop(boolean stop);
 }

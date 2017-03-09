@@ -102,6 +102,16 @@ public class Receiver extends BroadcastReceiver {
         }
     };
 
+    final WifiP2pManager.ActionListener discover= new WifiP2pManager.ActionListener() {
+        @Override
+        public void onSuccess() {}
+
+        @Override
+        public void onFailure(int reason) {
+            Toast.makeText(mainActivity, "Discover failed. Check your WIFI connexion", Toast.LENGTH_SHORT).show();
+        }
+    };
+
     private ConnectionInfoListener connectionInfoListener = new ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
@@ -289,6 +299,5 @@ public class Receiver extends BroadcastReceiver {
                         }
                     }
             );
-        wifiP2pManager.requestConnectionInfo(channel,connectionInfoListener);
     }
 }

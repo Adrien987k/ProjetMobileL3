@@ -34,12 +34,6 @@ public class HandlerPeer extends Thread {
         this.server = server;
         this.socket = socket;
         server.getHandlers().add(this);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(server.getMainActivity());
-        builder.setContentTitle("Server created")
-                .setContentText("")
-                .setSmallIcon(R.drawable.message_received);
-        NotificationManager nm = (NotificationManager) server.getMainActivity().getSystemService(NOTIFICATION_SERVICE);
-        nm.notify(0,builder.build());
     }
 
     public ArrayList<Point> getPoints() { return points; }
@@ -52,6 +46,7 @@ public class HandlerPeer extends Thread {
     @Override
     public void run() {
         super.run();
+        System.out.println("Handler created");
         try {
             InputStream buffer = socket.getInputStream();
 
@@ -68,12 +63,15 @@ public class HandlerPeer extends Thread {
             try {
                 server.getHandlers().remove(this);
                 socket.close();
+                System.out.println("Socket closed, server side");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+        System.out.println("Handler Closed");
+
     }
 
     public synchronized void sendPoints(ArrayList<Point> points) {
@@ -82,15 +80,20 @@ public class HandlerPeer extends Thread {
                 socket.getOutputStream().write(point.getBytes());
             }
         } catch (SocketException se) {
+            System.out.println("Socket broken while sending points");
             try {
                 server.getHandlers().remove(this);
                 socket.close();
-                stop = true;
+                setStop(true);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
     }
 }

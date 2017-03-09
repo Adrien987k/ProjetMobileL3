@@ -43,21 +43,20 @@ public class ServerP2P extends Thread {
 
     @Override
     public void run() {
-        try {
-            ServerSocket ss = new ServerSocket(port);
+        try (ServerSocket ss = new ServerSocket(port);){
+            System.out.println("Server Created");
             ss.setSoTimeout(1000);
-
             while(!stop) {
                 try {
                     Socket s = ss.accept();
-                   new HandlerPeer(this,s).start();
+                    new HandlerPeer(this,s).start();
                 } catch (SocketTimeoutException e) { }
             }
-
+            System.out.println("Server Closed");
+            ss.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public ArrayList<HandlerPeer> getHandlers() {
@@ -71,6 +70,11 @@ public class ServerP2P extends Thread {
     public PointSynchronizer getSynchronizer() {
         return synchronizer;
     }
-    
+
+    public void setStop(boolean stop) {
+        this.stop = stop;
+        for(HandlerPeer handler: handlers)
+            handler.setStop(stop);
+    }
 
 }

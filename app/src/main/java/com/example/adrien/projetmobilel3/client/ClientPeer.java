@@ -49,6 +49,7 @@ public class ClientPeer extends Thread implements PointTransmission {
             Socket socket = null;
             try {
                 socket = new Socket(serverAddress, ServerP2P.DEFAULT_PORT);
+                System.out.println("Socket created, client side");
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
@@ -58,7 +59,6 @@ public class ClientPeer extends Thread implements PointTransmission {
 
                 @Override
                 protected Boolean doInBackground(Socket... params) {
-
                     Socket socket = params[0];
                     while(!isStop()) {
                         try {
@@ -83,23 +83,29 @@ public class ClientPeer extends Thread implements PointTransmission {
 
             while(!stop) {
                 try {
-
                     byte[] buffer = new byte[Point.getByteLength()];
                     socket.getInputStream().read(buffer);
                     mainActivity.getDraw().addPoint(new Point(buffer));
 
                 } catch (SocketException e) {
                     e.printStackTrace();
-                    stop = true;
+                    setStop(true);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
             }
+            System.out.println("Socket Closed, client side");
+
         }
     }
 
     private boolean isStop() {
         return stop;
+    }
+
+    @Override
+    public void setStop(boolean stop) {
+        this.stop = stop;
     }
 
     private ArrayList<Point> getPoints() {

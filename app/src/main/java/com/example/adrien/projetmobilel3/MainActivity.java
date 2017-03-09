@@ -94,7 +94,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 ((Draw) v).addPoint(new Point(event.getX(),event.getY(),20, Color.BLUE));
-                transmission.addPoint(new Point(event.getX(),event.getY(),20, Color.RED));
+                if(transmission != null)
+                    transmission.addPoint(new Point(event.getX(),event.getY(),20, Color.RED));
                 v.invalidate();
                 return true;
             }

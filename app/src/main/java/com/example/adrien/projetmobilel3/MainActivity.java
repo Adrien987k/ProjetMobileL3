@@ -190,4 +190,8 @@ public class MainActivity extends AppCompatActivity {
     public Draw getDraw() {
         return draw;
     }
+
+    public void onClickPeerDiscovered(View v) {
+        receiver.connect(((TextView) v).getText().toString());
+    }
 }

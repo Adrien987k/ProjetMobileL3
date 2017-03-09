@@ -17,7 +17,7 @@ import java.util.ArrayList;
 
 public class Draw extends View {
 
-    private ArrayList<Point> points = new ArrayList<>();
+    private final ArrayList<Point> points = new ArrayList<>();
     public static int color;
     public static final int DEFAULT_COLOR = Color.BLACK;
 
@@ -37,15 +37,15 @@ public class Draw extends View {
 
 
 
-    public void addPoint(Point point) {
+    public synchronized void addPoint(Point point) {
         points.add(point);
+    }
+    public synchronized void addAllPoints(ArrayList<Point> points) {
+        points.addAll(points);
     }
 
     public ArrayList<Point> getPoints() {
         return points;
-    }
-    public void setPoints(ArrayList<Point> points) {
-        this.points = points;
     }
 
     @Override
@@ -53,7 +53,10 @@ public class Draw extends View {
         super.onDraw(canvas);
 
         Paint paint = new Paint();
-        for(Point point: points) {
+
+        ArrayList<Point> knownPoints = new ArrayList<>(getPoints());
+
+        for(Point point: knownPoints) {
             paint.setColor(point.getColor());
             paint.setStrokeWidth(point.getStroke());
             float x = point.getX();

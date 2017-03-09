@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adrien.projetmobilel3.client.ClientPeer;
 import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
@@ -84,6 +85,19 @@ public class Receiver extends BroadcastReceiver {
         }
     };
 
+
+    final WifiP2pManager.ActionListener discoverThenConnect = new WifiP2pManager.ActionListener() {
+        @Override
+        public void onSuccess() {
+            connect();
+        }
+
+        @Override
+        public void onFailure(int reason) {
+            Toast.makeText(mainActivity, "Discover failed. Check your WIFI connexion", Toast.LENGTH_SHORT).show();
+        }
+    };
+
     private ConnectionInfoListener connectionInfoListener = new ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
@@ -91,11 +105,13 @@ public class Receiver extends BroadcastReceiver {
                 if(info.isGroupOwner){
                     Toast.makeText(mainActivity, "Group owner", Toast.LENGTH_SHORT).show();
                     ServerP2P server = new ServerP2P(mainActivity);
+                    mainActivity.setTransmission(server.getSynchronizer());
                     // Do whatever tasks are specific to the group owner.
                     // One common case is creating a group owner thread and accepting
                     // incoming connections.
                 } else {
                     Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
+                    mainActivity.setTransmission(new ClientPeer(mainActivity,info.groupOwnerAddress));
                     // The other device acts as the peer (client). In this case,
                     // you'll want to create a peer thread that connects
                     // to the group owner.

@@ -168,7 +168,7 @@ public class Receiver extends BroadcastReceiver {
                 });
             }
         });
-
+/*
         Button sendToGroupOwner = (Button) mainActivity.findViewById(R.id.send_to_group_owner);
         sendToGroupOwner.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -219,7 +219,7 @@ public class Receiver extends BroadcastReceiver {
                 }
             });
         }
-    });
+    });*/
     }
 
 

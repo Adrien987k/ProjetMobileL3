@@ -63,10 +63,9 @@ public class ClientPeer extends Thread implements PointTransmission {
                     while(!isStop()) {
                         try {
                             if (getPoints().size() > 0) {
-
                                 ArrayList<Point> knownPoints = new ArrayList<>(getPoints());
-                                for (Point p : knownPoints) {
-                                    socket.getOutputStream().write(p.getBytes());
+                                for (Point point : knownPoints) {
+                                    socket.getOutputStream().write(point.getBytes());
                                 }
                                 getPoints().clear();
                             }
@@ -81,12 +80,12 @@ public class ClientPeer extends Thread implements PointTransmission {
                 }
             }.execute(new Socket[] {socket});
 
+            byte[] buffer;
             while(!stop) {
                 try {
-                    byte[] buffer = new byte[Point.getByteLength()];
+                    buffer = new byte[Point.getByteLength()];
                     socket.getInputStream().read(buffer);
                     mainActivity.getDraw().addPoint(new Point(buffer));
-
                 } catch (SocketException e) {
                     e.printStackTrace();
                     setStop(true);

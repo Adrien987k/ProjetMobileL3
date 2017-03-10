@@ -44,7 +44,6 @@ public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayLis
                         handler.sendPoints(knownPoints);
                     }
                 }
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

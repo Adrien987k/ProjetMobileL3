@@ -15,10 +15,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/peersList"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_below="@+id/sendStatus"
-        android:layout_toStartOf="@+id/send_to_group_owner" />
+        android:layout_alignStart="@+id/group_info_button"
+        android:layout_toStartOf="@+id/draw"
+        android:layout_below="@+id/group_info_button" />
 
+    <!--
     <Button
         android:text="Discover"
         android:layout_width="wrap_content"
@@ -37,47 +38,56 @@
         android:layout_toEndOf="@+id/group_info_button"
         android:layout_marginStart="39dp" />
 
+     <Button
+    android:text="Send to Group Owner"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/send_to_group_owner"
+    android:layout_alignBaseline="@+id/group_info_button"
+    android:layout_alignBottom="@+id/group_info_button"
+    android:layout_toEndOf="@+id/group_info_button" />
+
+    <TextView
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_below="@+id/send_to_group_owner"
+    android:layout_alignParentEnd="true"
+    android:id="@+id/sendStatus" />
+    -->
+
     <Button
         android:text="Group info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/group_info_button"
-        android:layout_marginTop="22dp"
-        android:layout_below="@+id/discover_button"
-        android:layout_alignParentStart="true"
-        android:layout_marginStart="21dp" />
-
-    <Button
-        android:text="Send to Group Owner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/send_to_group_owner"
-        android:layout_alignBaseline="@+id/group_info_button"
-        android:layout_alignBottom="@+id/group_info_button"
-        android:layout_toEndOf="@+id/group_info_button" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/send_to_group_owner"
-        android:layout_alignParentEnd="true"
-        android:id="@+id/sendStatus" />
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
 
     <com.example.adrien.projetmobilel3.draw.Draw
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/draw"
+        android:layout_toEndOf="@+id/group_info_button"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true" />
+
+    <!--
+    <com.example.adrien.projetmobilel3.draw.DrawSurface
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/drawSurface"
+        android:layout_below="@+id/refresh_button"
         android:layout_alignEnd="@+id/sendStatus"
         android:layout_toEndOf="@+id/peersList"
-        android:layout_below="@+id/refresh_button" />
+        android:layout_alignParentBottom="true" />
+    -->
 
     <Button
         android:id="@+id/refresh_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/send_to_group_owner"
-        android:layout_below="@+id/sendStatus"
-        android:layout_marginEnd="25dp"
-        android:text="Refresh" />
+        android:text="Refresh"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true" />
 
 </RelativeLayout>

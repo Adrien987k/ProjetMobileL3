@@ -49,28 +49,18 @@ public class HandlerPeer extends Thread {
         System.out.println("Handler created");
         try {
             InputStream buffer = socket.getInputStream();
-
+            byte[] bufferData;
             while (!stop) {
-
-                byte[] bufferData = new byte[Point.getByteLength()];
+                bufferData = new byte[Point.getByteLength()];
                 buffer.read(bufferData);
-                Point p = new Point(bufferData);
-                server.getMainActivity().getDraw().addPoint(p);
-
-            }
-            points.clear();
-        } catch (SocketException se) {
-            try {
-                server.getHandlers().remove(this);
-                socket.close();
-                System.out.println("Socket closed, server side");
-            } catch (IOException e) {
-                e.printStackTrace();
+                server.getMainActivity().getDraw().addPoint(new Point(bufferData));
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            server.getHandlers().remove(this);
+            System.out.println("Handler Closed");
         }
-        System.out.println("Handler Closed");
 
     }
 
@@ -78,15 +68,6 @@ public class HandlerPeer extends Thread {
         try {
             for (Point point : points) {
                 socket.getOutputStream().write(point.getBytes());
-            }
-        } catch (SocketException se) {
-            System.out.println("Socket broken while sending points");
-            try {
-                server.getHandlers().remove(this);
-                socket.close();
-                setStop(true);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         } catch (IOException e) {
             e.printStackTrace();

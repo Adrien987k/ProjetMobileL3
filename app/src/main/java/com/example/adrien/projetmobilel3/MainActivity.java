@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.example.adrien.projetmobilel3.client.ClientPeer;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
+import com.example.adrien.projetmobilel3.draw.DrawSurface;
 import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.PointSynchronizer;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
@@ -61,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
 
         wifiP2pManager.discoverPeers(channel,receiver.discover);
 
-
+/*
         //TODO: boutons à enlever
         // mais pratique pour tester rapidement
         Button discoverButton = (Button)findViewById(R.id.discover_button);
@@ -87,63 +88,41 @@ public class MainActivity extends AppCompatActivity {
                 receiver.connect();
             }
         });
-
+*/
         draw = (Draw) findViewById(R.id.draw);
         draw.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                ((Draw) v).addPoint(new Point(event.getX(),event.getY(),20, Color.BLUE));
+                boolean follower = false;
+                if(event.getAction() == MotionEvent.ACTION_MOVE)
+                    follower = true;
+                ((Draw) v).addPoint(new Point(event.getX(),event.getY(),20, Color.BLUE,follower));
                 if(transmission != null)
-                    transmission.addPoint(new Point(event.getX(),event.getY(),20, Color.RED));
-                v.invalidate();
+                    transmission.addPoint(new Point(event.getX(),event.getY(),20, Color.RED,follower));
                 return true;
             }
         });
+
+
+/*
+        //TODO à enlever si classe non corrigée
+        DrawSurface drawSurface = (DrawSurface) findViewById(R.id.drawSurface);
+        drawSurface.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                ((DrawSurface) v).addPoint(new Point(event.getX(),event.getY(),20, Color.BLUE));
+                return true;
+            }
+        });*/
 
         Button refreshButton = (Button) findViewById(R.id.refresh_button);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.this.getDraw().getPoints().clear();
+                MainActivity.this.getDraw().clear();
             }
         });
-
-        //TODO à revoir probablement
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while(true) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            draw.invalidate();
-                        }
-                    });
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
     }
-
-    /*
-    public void isSent(boolean isSent) {
-
-        if(isSent) {
-            ((TextView) findViewById(R.id.sendStatus)).setText("Sent");
-            NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-            builder.setContentTitle("Message received")
-                    .setContentText("Message received from the server")
-                    .setSmallIcon(R.drawable.message_received);
-            NotificationManager nm = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-            nm.notify(0,builder.build());
-        } else
-            ( (TextView) findViewById(R.id.sendStatus)).setText("Not sent");
-    }
-*/
 
     //TODO sauvegarde des données
     @Override
@@ -204,6 +183,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setStop(boolean stop) {
-        transmission.setStop(stop);
+        if(transmission != null)
+            transmission.setStop(stop);
     }
 }

@@ -69,6 +69,7 @@ public class Draw extends   View {
         return foreignPoints;
     }
 
+    //TODO ordre incorrect, les points étrangers seront toujours dessinés par dessus
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -88,7 +89,6 @@ public class Draw extends   View {
                 paint.reset();
             }
 */
-            //TODO dessiner des traits qui ressemblent à quelque chose
             for(int i = 0; i < knownPoints.size()-1; i++) {
                 Point point1 = knownPoints.get(i);
                 Point point2 = knownPoints.get(i+1);
@@ -139,7 +139,7 @@ public class Draw extends   View {
 
     public synchronized void clear() {
         getPoints().clear();
-        getForeignPoints();
+        getForeignPoints().clear();
         post(invalidateRun);
     }
 }

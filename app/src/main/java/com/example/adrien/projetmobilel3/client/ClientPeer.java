@@ -85,7 +85,7 @@ public class ClientPeer extends Thread implements PointTransmission {
                 try {
                     buffer = new byte[Point.getByteLength()];
                     socket.getInputStream().read(buffer);
-                    mainActivity.getDraw().addPoint(new Point(buffer));
+                    mainActivity.getDraw().addPoint(new Point(buffer),false);
                 } catch (SocketException e) {
                     e.printStackTrace();
                     setStop(true);

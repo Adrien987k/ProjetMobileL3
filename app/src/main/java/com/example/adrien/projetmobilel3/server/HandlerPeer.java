@@ -53,7 +53,7 @@ public class HandlerPeer extends Thread {
             while (!stop) {
                 bufferData = new byte[Point.getByteLength()];
                 buffer.read(bufferData);
-                server.getMainActivity().getDraw().addPoint(new Point(bufferData));
+                server.getMainActivity().getDraw().addPoint(new Point(bufferData),false);
             }
         } catch (IOException e) {
             e.printStackTrace();

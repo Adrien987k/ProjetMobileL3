@@ -125,6 +125,8 @@ public class Receiver extends BroadcastReceiver {
                     // incoming connections.
                 } else {
                     Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
+                    if(mainActivity.getTransmission() != null)
+                        mainActivity.getTransmission().setStop(true);
                     mainActivity.setTransmission(new ClientPeer(mainActivity,info.groupOwnerAddress));
                     // The other device acts as the peer (client). In this case,
                     // you'll want to create a peer thread that connects

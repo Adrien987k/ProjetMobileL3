@@ -96,7 +96,7 @@ public class MainActivity extends AppCompatActivity {
                 boolean follower = false;
                 if(event.getAction() == MotionEvent.ACTION_MOVE)
                     follower = true;
-                ((Draw) v).addPoint(new Point(event.getX(),event.getY(),20, Color.BLUE,follower));
+                ((Draw) v).addPoint(new Point(event.getX(),event.getY(),20, Color.BLUE,follower),true);
                 if(transmission != null)
                     transmission.addPoint(new Point(event.getX(),event.getY(),20, Color.RED,follower));
                 return true;
@@ -170,8 +170,12 @@ public class MainActivity extends AppCompatActivity {
         this.transmission = transmission;
     }
 
+
     public Channel getChannel() {
         return channel;
+    }
+    public PointTransmission getTransmission() {
+        return transmission;
     }
 
     public Draw getDraw() {

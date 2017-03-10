@@ -18,6 +18,8 @@ import java.util.ArrayList;
 public class Draw extends   View {
 
     private final ArrayList<Point> points = new ArrayList<>();
+    private final ArrayList<Point> foreignPoints = new ArrayList<>();
+
     public static int color;
     public static final int DEFAULT_COLOR = Color.BLACK;
 
@@ -44,19 +46,27 @@ public class Draw extends   View {
         stroke = parcel.readInt();
     }
 
-    public synchronized void addPoint(Point point) {
-        points.add(point);
-        //postInvalidate();
+    public synchronized void addPoint(Point point, boolean local) {
+        if(local)
+            points.add(point);
+        else
+            foreignPoints.add(point);
         post(invalidateRun);
     }
-    public synchronized void addAllPoints(ArrayList<Point> points) {
-        points.addAll(points);
-        //postInvalidate();
+    public synchronized void addAllPoints(ArrayList<Point> points, boolean local) {
+        if(local)
+            points.addAll(points);
+        else
+            foreignPoints.addAll(points);
+
         post(invalidateRun);
     }
 
     public ArrayList<Point> getPoints() {
         return points;
+    }
+    public ArrayList<Point> getForeignPoints() {
+        return foreignPoints;
     }
 
     @Override
@@ -101,11 +111,35 @@ public class Draw extends   View {
                 canvas.drawCircle(x2,y2,paint.getStrokeMiter(),paint);
             }
 
+            knownPoints = getForeignPoints();
+            for(int i = 0; i < knownPoints.size()-1; i++) {
+                Point point1 = knownPoints.get(i);
+                Point point2 = knownPoints.get(i+1);
+
+                float x1 = point1.getX();
+                float y1 = point1.getY();
+                float x2 = point2.getX();
+                float y2 = point2.getY();
+
+                paint.setColor(point1.getColor());
+                paint.setStrokeWidth(point1.getStroke());
+                canvas.drawCircle(x1,y1,paint.getStrokeWidth()/2,paint);
+
+                if(point2.getFollower())
+                    canvas.drawLine(x2,y2,x1,y1,paint);
+
+                paint.setColor(point2.getColor());
+                paint.setStrokeWidth(point2.getStroke());
+
+                canvas.drawCircle(x2,y2,paint.getStrokeMiter(),paint);
+            }
+
         }
     }
 
     public synchronized void clear() {
         getPoints().clear();
+        getForeignPoints();
         post(invalidateRun);
     }
 }

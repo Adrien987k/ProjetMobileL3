@@ -2,14 +2,18 @@ package com.example.adrien.projetmobilel3.draw;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Parcel;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * Created by MrkJudge on 24/01/2017.
@@ -17,129 +21,84 @@ import java.util.ArrayList;
 
 public class Draw extends   View {
 
-    private final ArrayList<Point> points = new ArrayList<>();
-    private final ArrayList<Point> foreignPoints = new ArrayList<>();
-
     public static int color;
     public static final int DEFAULT_COLOR = Color.BLACK;
 
     public static int stroke;
     public static final int DEFAULT_STROKE = 1;
 
-    private final Runnable invalidateRun = new Runnable() {
-        @Override
-        public void run() {
-            invalidate();
-        }
-    };
+    private Paint paint = new Paint();
+    private Path path = new Path();
+    private Canvas myCanvas = new Canvas();
+    private Bitmap bitMap;
 
-    private final Paint paint = new Paint();
+    private Draw(Context context, AttributeSet attrs, int color, int stroke) {
+        super(context,attrs);
+        Draw.color = color;
+        Draw.stroke = stroke;
+        init();
+    }
 
     public Draw(Context context, AttributeSet attrs) {
-        super(context,attrs);
-        color = DEFAULT_COLOR;
-        stroke = DEFAULT_STROKE;
+        this(context,attrs,DEFAULT_COLOR,DEFAULT_STROKE);
     }
     public Draw(Context context, AttributeSet attrs, Parcel parcel) {
-        super(context,attrs);
-        color = parcel.readInt();
-        stroke = parcel.readInt();
+        this(context,attrs,parcel.readInt(),parcel.readInt());
     }
 
-    public synchronized void addPoint(Point point, boolean local) {
-        if(local)
-            points.add(point);
-        else
-            foreignPoints.add(point);
-        post(invalidateRun);
-    }
-    public synchronized void addAllPoints(ArrayList<Point> points, boolean local) {
-        if(local)
-            points.addAll(points);
-        else
-            foreignPoints.addAll(points);
-
-        post(invalidateRun);
+    public Canvas getMyCanvas() {
+        return myCanvas;
     }
 
-    public ArrayList<Point> getPoints() {
-        return points;
+    public void init() {
+        paint.setAntiAlias(true);
+        paint.setStrokeWidth(30);
+        paint.setStyle(Paint.Style.STROKE);
+        paint.setStrokeJoin(Paint.Join.ROUND);
+        paint.setStrokeCap(Paint.Cap.ROUND);
     }
-    public ArrayList<Point> getForeignPoints() {
-        return foreignPoints;
+
+    public synchronized void addEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                path.moveTo(x, y);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                path.lineTo(x, y);
+                break;
+            case MotionEvent.ACTION_UP:
+                path.lineTo(x, y);
+                myCanvas.drawPath(path, paint);
+                path.reset();
+                break;
+        }
+        postInvalidate();
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        bitMap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+        myCanvas = new Canvas(bitMap);
     }
 
     //TODO ordre incorrect, les points étrangers seront toujours dessinés par dessus
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        synchronized (canvas) {
-            paint.setColor(Color.WHITE);
-            canvas.drawColor(Color.WHITE);
-            paint.reset();
 
-            ArrayList<Point> knownPoints = new ArrayList<>(getPoints());
-/*
-            for (Point point : knownPoints) {
-                paint.setColor(point.getColor());
-                paint.setStrokeWidth(point.getStroke());
-                float x = point.getX();
-                float y = point.getY();
-                canvas.drawPoint(x, y, paint);
-                paint.reset();
-            }
-*/
-            for(int i = 0; i < knownPoints.size()-1; i++) {
-                Point point1 = knownPoints.get(i);
-                Point point2 = knownPoints.get(i+1);
+        paint.setColor(Color.BLUE);
+        paint.setStrokeWidth(30);
 
-                float x1 = point1.getX();
-                float y1 = point1.getY();
-                float x2 = point2.getX();
-                float y2 = point2.getY();
+        canvas.drawBitmap(bitMap,0,0,paint);
+        canvas.drawPath(path,paint);
 
-                paint.setColor(point1.getColor());
-                paint.setStrokeWidth(point1.getStroke());
-                canvas.drawCircle(x1,y1,paint.getStrokeWidth()/2,paint);
-
-                if(point2.getFollower())
-                    canvas.drawLine(x2,y2,x1,y1,paint);
-
-                paint.setColor(point2.getColor());
-                paint.setStrokeWidth(point2.getStroke());
-
-                canvas.drawCircle(x2,y2,paint.getStrokeMiter(),paint);
-            }
-
-            knownPoints = getForeignPoints();
-            for(int i = 0; i < knownPoints.size()-1; i++) {
-                Point point1 = knownPoints.get(i);
-                Point point2 = knownPoints.get(i+1);
-
-                float x1 = point1.getX();
-                float y1 = point1.getY();
-                float x2 = point2.getX();
-                float y2 = point2.getY();
-
-                paint.setColor(point1.getColor());
-                paint.setStrokeWidth(point1.getStroke());
-                canvas.drawCircle(x1,y1,paint.getStrokeWidth()/2,paint);
-
-                if(point2.getFollower())
-                    canvas.drawLine(x2,y2,x1,y1,paint);
-
-                paint.setColor(point2.getColor());
-                paint.setStrokeWidth(point2.getStroke());
-
-                canvas.drawCircle(x2,y2,paint.getStrokeMiter(),paint);
-            }
-
-        }
     }
 
     public synchronized void clear() {
-        getPoints().clear();
-        getForeignPoints().clear();
-        post(invalidateRun);
+        myCanvas.drawColor(Color.WHITE);
     }
 }

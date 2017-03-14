@@ -8,10 +8,16 @@
     android:fitsSystemWindows="true"
     tools:openDrawer="start">
 
+
+    <com.example.adrien.projetmobilel3.draw.Draw
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/draw_content" />
+    <!--
     <include
         layout="@layout/app_bar_draw"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" /> -->
 
     <android.support.design.widget.NavigationView
         android:id="@+id/nav_view"

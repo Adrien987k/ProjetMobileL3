@@ -4,15 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:layout_editor_absoluteX="8dp"
-    tools:layout_editor_absoluteY="8dp">
+    tools:layout_editor_absoluteY="8dp"
+    tools:context=".DrawActivity">
 
-    <com.example.adrien.projetmobilel3.draw.Draw
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/draw"
-        android:layout_alignEnd="@+id/sendStatus"
-        android:layout_toEndOf="@+id/peersList"
-        android:layout_below="@+id/refresh_button" />
 
 
 </RelativeLayout>

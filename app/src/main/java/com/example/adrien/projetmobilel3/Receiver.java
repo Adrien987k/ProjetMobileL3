@@ -20,6 +20,7 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 //import android.util.Log;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.v7.app.NotificationCompat;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -72,18 +73,29 @@ public class Receiver extends BroadcastReceiver {
 
                 //notify changement
             }
-
+/*
             ListView lv = (ListView) mainActivity.findViewById(R.id.peersList);
             //ArrayAdapter<WifiP2pDevice> aas = new ArrayAdapter<>(mainActivity,R.layout.peer_item_adapter);
             ArrayAdapter<String> as = new ArrayAdapter<>(mainActivity,R.layout.peer_item_adapter);
             lv.setAdapter(as);
+*/
+
+            ArrayList<String> peersName = new ArrayList<>();
             for(WifiP2pDevice device: peers) {
                 peersInfo.put(device.deviceName,device.deviceAddress);
-                as.add(device.deviceName);
+                //as.add(device.deviceName);
+                peersName.add(device.deviceName);
             }
 
+            Intent intent = new Intent(mainActivity,ConnexionActivity.class);
+
+            String[] names = peersName.toArray(new String[peersName.size()]);
+            intent.putExtra("peersName",names);
+
+            mainActivity.startActivityForResult(intent,1);
+
             if(peers.size() == 0){
-                as.add("No device found");
+                //as.add("No device found");
                 return;
             } else {
 
@@ -104,7 +116,7 @@ public class Receiver extends BroadcastReceiver {
         }
     };
 
-    final WifiP2pManager.ActionListener discover= new WifiP2pManager.ActionListener() {
+    final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener() {
         @Override
         public void onSuccess() {}
 
@@ -129,8 +141,9 @@ public class Receiver extends BroadcastReceiver {
                     Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
                     if(mainActivity.getTransmission() != null)
                         mainActivity.getTransmission().setStop(true);
-                    if(hardwareAddress != null)
-                        mainActivity.setTransmission(new ClientPeer(mainActivity,info.groupOwnerAddress,hardwareAddress));
+                    if(hardwareAddress != null) {
+                        mainActivity.setTransmission(new ClientPeer(mainActivity, info.groupOwnerAddress, hardwareAddress));
+                    }
                     else {
                         try {
                             throw new Exception("Hardware address unknown");
@@ -141,7 +154,13 @@ public class Receiver extends BroadcastReceiver {
                     // The other device acts as the peer (client). In this case,
                     // you'll want to create a peer thread that connects
                     // to the group owner.
+
                 }
+                /*
+                Intent intent = new Intent(mainActivity,DrawActivity.class);
+                intent.putExtra("hardwareAddress",hardwareAddress.getBytes());
+                mainActivity.startActivity(intent);
+*/
             }
         }
     };
@@ -150,13 +169,12 @@ public class Receiver extends BroadcastReceiver {
         this.wifiP2pManager = wifiP2pManager;
         this.channel = channel;
         this.mainActivity = activity;
-        buttons();
     }
 
     public HardwareAddress getHardwareAddress() {
         return hardwareAddress;
     }
-
+/*
     //TODO: boutons à enlever
     // mais pratique pour tester rapidement
     private void buttons() {
@@ -182,7 +200,7 @@ public class Receiver extends BroadcastReceiver {
                 });
             }
         });
-/*
+
         Button sendToGroupOwner = (Button) mainActivity.findViewById(R.id.send_to_group_owner);
         sendToGroupOwner.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -233,8 +251,8 @@ public class Receiver extends BroadcastReceiver {
                 }
             });
         }
-    });*/
-    }
+    });
+    }*/
 
 
     @Override

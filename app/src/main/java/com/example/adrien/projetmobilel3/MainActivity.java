@@ -1,6 +1,7 @@
 package com.example.adrien.projetmobilel3;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.net.wifi.p2p.WifiP2pInfo;
@@ -20,8 +21,6 @@ import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
 import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
-
-//TODO L'application plante quand l'un se déconnecte
 
 public class MainActivity extends AppCompatActivity {
 
@@ -46,13 +45,8 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-        wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        channel = wifiP2pManager.initialize(this, getMainLooper(), null);
-        receiver = new Receiver(wifiP2pManager, channel, this);
 
 
-
-        wifiP2pManager.discoverPeers(channel,receiver.discover);
 
         draw = (Draw) findViewById(R.id.draw);
         draw.setOnTouchListener(new View.OnTouchListener() {
@@ -73,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
                 MainActivity.this.getDraw().clear();
             }
         });
+
+        wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        channel = wifiP2pManager.initialize(this, getMainLooper(), null);
+        receiver = new Receiver(wifiP2pManager, channel, this);
+        wifiP2pManager.discoverPeers(channel,receiver.discover);
+
     }
 
     //TODO sauvegarde des données
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         receiver = new Receiver(wifiP2pManager, channel, this);
         registerReceiver(receiver, intentFilter);
-        wifiP2pManager.discoverPeers(channel,receiver.discoverThenConnect);
+       // wifiP2pManager.discoverPeers(channel,receiver.discoverThenConnect);
         wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
@@ -89,12 +89,10 @@ public class MainActivity extends AppCompatActivity {
                     if(info.isGroupOwner) {
                         ServerP2P server = new ServerP2P(MainActivity.this);
                         setTransmission(server.getSynchronizer());
-                        setTransmission(server.getSynchronizer());
+
                     } else {
                      //   transmission = new ClientPeer(MainActivity.this, info.groupOwnerAddress);
                     }
-                } else {
-                    Toast.makeText(mainActivity, "reconnexion failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -144,4 +142,19 @@ public class MainActivity extends AppCompatActivity {
             transmission.setStop(stop);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(!data.getBooleanExtra("localMode",true)) {
+            if(data.getBooleanExtra("serverMode",false)) {
+                if(transmission == null) {
+                    ServerP2P server = new ServerP2P(MainActivity.this);
+                    setTransmission(server.getSynchronizer());
+                }
+            } else {
+                receiver.connect(data.getStringExtra("deviceName"));
+            }
+        }
+    }
 }

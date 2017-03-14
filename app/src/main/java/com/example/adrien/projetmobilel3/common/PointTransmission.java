@@ -1,5 +1,7 @@
 package com.example.adrien.projetmobilel3.common;
 
+import android.view.MotionEvent;
+
 import com.example.adrien.projetmobilel3.draw.Point;
 
 import java.util.ArrayList;
@@ -9,6 +11,6 @@ import java.util.ArrayList;
  */
 
 public interface PointTransmission {
-    public void addPoint(Point point);
-    public void addAllPoints(ArrayList<Point> points$);
+    void addPointPacket(PointPacket pointPacket);
+    void setStop(boolean stop);
 }

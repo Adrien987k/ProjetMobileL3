@@ -40,6 +40,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,6 +58,7 @@ public class Receiver extends BroadcastReceiver {
     private MainActivity mainActivity;
 
     private List<WifiP2pDevice> peers = new ArrayList<>();
+    private HashMap<String,String> peersInfo = new HashMap<>();
 
     private PeerListListener peerListListener = new PeerListListener() {
         @Override
@@ -73,8 +75,10 @@ public class Receiver extends BroadcastReceiver {
             //ArrayAdapter<WifiP2pDevice> aas = new ArrayAdapter<>(mainActivity,R.layout.peer_item_adapter);
             ArrayAdapter<String> as = new ArrayAdapter<>(mainActivity,R.layout.peer_item_adapter);
             lv.setAdapter(as);
-            for(WifiP2pDevice device: peers)
+            for(WifiP2pDevice device: peers) {
+                peersInfo.put(device.deviceName,device.deviceAddress);
                 as.add(device.deviceName);
+            }
 
             if(peers.size() == 0){
                 as.add("No device found");
@@ -98,6 +102,16 @@ public class Receiver extends BroadcastReceiver {
         }
     };
 
+    final WifiP2pManager.ActionListener discover= new WifiP2pManager.ActionListener() {
+        @Override
+        public void onSuccess() {}
+
+        @Override
+        public void onFailure(int reason) {
+            Toast.makeText(mainActivity, "Discover failed. Check your WIFI connexion", Toast.LENGTH_SHORT).show();
+        }
+    };
+
     private ConnectionInfoListener connectionInfoListener = new ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
@@ -111,6 +125,8 @@ public class Receiver extends BroadcastReceiver {
                     // incoming connections.
                 } else {
                     Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
+                    if(mainActivity.getTransmission() != null)
+                        mainActivity.getTransmission().setStop(true);
                     mainActivity.setTransmission(new ClientPeer(mainActivity,info.groupOwnerAddress));
                     // The other device acts as the peer (client). In this case,
                     // you'll want to create a peer thread that connects
@@ -154,7 +170,7 @@ public class Receiver extends BroadcastReceiver {
                 });
             }
         });
-
+/*
         Button sendToGroupOwner = (Button) mainActivity.findViewById(R.id.send_to_group_owner);
         sendToGroupOwner.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,7 +221,7 @@ public class Receiver extends BroadcastReceiver {
                 }
             });
         }
-    });
+    });*/
     }
 
 
@@ -258,17 +274,32 @@ public class Receiver extends BroadcastReceiver {
                     wifiP2pManager.requestConnectionInfo(channel, connectionInfoListener);
                 }
 
-
                 @Override
                 public void onFailure(int reason) {
                     Toast.makeText(mainActivity, "Connection failed. Retry.", Toast.LENGTH_SHORT)
                             .show();
                 }
-            }
-
-            );
+            });
         }
-
     }
 
+    public void connect(String deviceName){
+            WifiP2pConfig config = new WifiP2pConfig();
+            config.deviceAddress = peersInfo.get(deviceName);
+            config.wps.setup = WpsInfo.PBC;
+
+            wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+                            wifiP2pManager.requestConnectionInfo(channel, connectionInfoListener);
+                        }
+
+                        @Override
+                        public void onFailure(int reason) {
+                            Toast.makeText(mainActivity, "Connection failed. Retry.", Toast.LENGTH_SHORT)
+                                    .show();
+                        }
+                    }
+            );
+    }
 }

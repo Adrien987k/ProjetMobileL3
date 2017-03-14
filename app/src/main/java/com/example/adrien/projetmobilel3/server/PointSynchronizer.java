@@ -2,11 +2,10 @@ package com.example.adrien.projetmobilel3.server;
 
 import android.os.AsyncTask;
 
+import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Point;
 
-import java.lang.reflect.Array;
-import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
@@ -16,11 +15,10 @@ import java.util.ArrayList;
 //TODO non terminé
 public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayList<Point>,Boolean> implements PointTransmission{
 
-    private ArrayList<HandlerPeer> handlers;
-    private final ArrayList<Point> points = new ArrayList<>();
-    private ServerP2P server;
     public static final int REFRESH_RATE = 100;
-
+    private final ArrayList<PointPacket> pointPackets = new ArrayList<>();
+    private ArrayList<HandlerPeer> handlers;
+    private ServerP2P server;
     private boolean stop = false;
 
     public PointSynchronizer(ServerP2P server) {
@@ -34,18 +32,14 @@ public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayLis
 
         while(!stop) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(REFRESH_RATE);
                 gatherPoints();
-
-                synchronized (points) {
-                    ArrayList<Point> knownPoints = new ArrayList<>(points);
                     ArrayList<HandlerPeer> knownHandlers = new ArrayList<>(handlers);
+                    ArrayList<PointPacket> knownPointPackets = new ArrayList<>(pointPackets);
+                    pointPackets.clear();
                     for (HandlerPeer handler : knownHandlers) {
-                        handler.sendPoints(knownPoints);
+                        handler.sendPointPackets(knownPointPackets);
                     }
-                    points.clear();
-                }
-
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -55,24 +49,17 @@ public class PointSynchronizer extends AsyncTask<ArrayList<HandlerPeer>,ArrayLis
     }
 
     private synchronized void gatherPoints(){
-        synchronized (handlers) {
-            for (HandlerPeer handler : handlers) {
-                getPoints().addAll(handler.gatherPoints());
-            }
-        }
-    }
-
-    private ArrayList<Point> getPoints() {
-        return points;
+        //TODO
     }
 
     @Override
-    public synchronized void addPoint(Point point) {
-        getPoints().add(point);
+    public synchronized void addPointPacket(PointPacket pointPacket) {
+        pointPackets.add(pointPacket);
     }
 
     @Override
-    public synchronized void addAllPoints(ArrayList<Point> points) {
-        getPoints().addAll(points);
+    public void setStop(boolean stop) {
+        this.stop = stop;
+        server.setStop(stop);
     }
 }

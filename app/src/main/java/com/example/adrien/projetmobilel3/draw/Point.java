@@ -4,13 +4,18 @@ import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.example.adrien.projetmobilel3.MainActivity;
+
 import java.nio.ByteBuffer;
+import java.nio.charset.MalformedInputException;
 
 /**
  * Created by MrkJudge on 24/02/2017.
  */
 
 public class Point implements Parcelable {
+
+    public static final int BYTES = (Float.SIZE / Byte.SIZE) * 2 + (Integer.SIZE / Byte.SIZE) *2;
 
     private float x;
     private float y;
@@ -36,10 +41,6 @@ public class Point implements Parcelable {
         this.color = color;
     }
 
-    public Point(float x, float y) {
-        this(x,y, Color.BLACK,1);
-    }
-
     public Point(byte[] bytes) {
         ByteBuffer buffer = ByteBuffer.wrap(bytes);
         this.x = buffer.getFloat();
@@ -54,10 +55,10 @@ public class Point implements Parcelable {
         this.stroke = parcel.readInt();
         this.color = parcel.readInt();
     }
+
     public float getX() { return x; }
     public float getY() { return y; }
     public int getStroke() { return stroke; }
-
     public int getColor() { return color; }
 
     @Override
@@ -73,12 +74,8 @@ public class Point implements Parcelable {
         dest.writeInt(color);
     }
 
-    public static int getByteLength() {
-        return Float.SIZE *2 + Integer.SIZE *2;
-    }
-
     public byte[] getBytes() {
-        ByteBuffer buffer = ByteBuffer.allocate(getByteLength());
+        ByteBuffer buffer = ByteBuffer.allocate(BYTES);
 
         buffer.putFloat(x);
         buffer.putFloat(y);
@@ -88,12 +85,9 @@ public class Point implements Parcelable {
         return buffer.array();
     }
 
-    public static Point getByBytes(byte[] bytes) {
-        return new Point(bytes);
-    }
-
     @Override
     public String toString() {
         return "(" + x + "," + y + ")" + " stroke: " + stroke + " color: " + color;
     }
+
 }

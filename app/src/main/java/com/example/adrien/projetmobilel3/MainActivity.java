@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
@@ -60,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
                 ((Draw) v).addEvent(event);
                 if(transmission != null)
-                    transmission.addPointPacket(new PointPacket(new Point(event.getX(),event.getY(),20, Color.RED),event.getAction()));
+                    transmission.addPointPacket(new PointPacket(new Point(event.getX(),event.getY(),20, Color.RED),event.getAction(),receiver.getHardwareAddress()));
                 return true;
             }
         });
@@ -125,6 +126,9 @@ public class MainActivity extends AppCompatActivity {
     }
     public PointTransmission getTransmission() {
         return transmission;
+    }
+    public HardwareAddress getHardwareAddress() {
+        return receiver.getHardwareAddress();
     }
 
     public Draw getDraw() {

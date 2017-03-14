@@ -29,6 +29,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.adrien.projetmobilel3.client.ClientPeer;
+import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
@@ -55,6 +56,7 @@ public class Receiver extends BroadcastReceiver {
 
     private WifiP2pManager wifiP2pManager;
     private Channel channel;
+    private HardwareAddress hardwareAddress;
     private MainActivity mainActivity;
 
     private List<WifiP2pDevice> peers = new ArrayList<>();
@@ -127,7 +129,15 @@ public class Receiver extends BroadcastReceiver {
                     Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
                     if(mainActivity.getTransmission() != null)
                         mainActivity.getTransmission().setStop(true);
-                    mainActivity.setTransmission(new ClientPeer(mainActivity,info.groupOwnerAddress));
+                    if(hardwareAddress != null)
+                        mainActivity.setTransmission(new ClientPeer(mainActivity,info.groupOwnerAddress,hardwareAddress));
+                    else {
+                        try {
+                            throw new Exception("Hardware address unknown");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
                     // The other device acts as the peer (client). In this case,
                     // you'll want to create a peer thread that connects
                     // to the group owner.
@@ -140,9 +150,11 @@ public class Receiver extends BroadcastReceiver {
         this.wifiP2pManager = wifiP2pManager;
         this.channel = channel;
         this.mainActivity = activity;
-
         buttons();
+    }
 
+    public HardwareAddress getHardwareAddress() {
+        return hardwareAddress;
     }
 
     //TODO: boutons à enlever
@@ -254,7 +266,8 @@ public class Receiver extends BroadcastReceiver {
         } else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
 
         } else if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
-            //DeviceListFragment fragment = (DeviceList)
+            WifiP2pDevice device = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
+            hardwareAddress = HardwareAddress.parseHardwareAddress(device.deviceAddress);
         }
     }
 

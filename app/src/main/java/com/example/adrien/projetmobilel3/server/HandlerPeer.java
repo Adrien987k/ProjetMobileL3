@@ -1,18 +1,14 @@
 package com.example.adrien.projetmobilel3.server;
 
-import android.app.Activity;
-import android.app.NotificationManager;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.NotificationCompat;
 import android.view.MotionEvent;
-import android.widget.Toast;
 
 import com.example.adrien.projetmobilel3.MainActivity;
-import com.example.adrien.projetmobilel3.R;
+import com.example.adrien.projetmobilel3.common.DrawTools;
+import com.example.adrien.projetmobilel3.common.HardwareAddress;
+import com.example.adrien.projetmobilel3.common.Message;
 import com.example.adrien.projetmobilel3.common.PointPacket;
-import com.example.adrien.projetmobilel3.draw.Point;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +16,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
 
 /**
  * Created by MrkJudge on 24/02/2017.
@@ -36,30 +30,41 @@ public class HandlerPeer extends Thread {
 
     private boolean stop = false;
 
-    private Path path = new Path();
-    private Paint paint = new Paint();
+    private Path localPath = new Path();
+    private Paint localPaint = new Paint();
+
+    private final ArrayList<PointPacket> pointPackets = new ArrayList<>();
 
 
     public HandlerPeer(ServerP2P server,Socket socket) {
         this.server = server;
         this.socket = socket;
-        server.getHandlers().add(this);
         init();
     }
 
     private void init() {
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeCap(Paint.Cap.ROUND);
+        localPaint.setAntiAlias(true);
+        localPaint.setStyle(Paint.Style.STROKE);
+        localPaint.setStrokeJoin(Paint.Join.ROUND);
+        localPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     public MainActivity getMainActivity() {
         return server.getMainActivity();
     }
+    public DrawTools getDrawTools() {
+        return new DrawTools(localPath, localPaint);
+    }
+    public ArrayList<PointPacket> getPointPackets() {
+        return pointPackets;
+    }
 
     //TODO en fonction de celle du synchronize
-    public synchronized void gatherPoints() {}
+    public synchronized ArrayList<PointPacket> gatherPoints() {
+        ArrayList<PointPacket> knownPointPackets = new ArrayList<>(pointPackets);
+        pointPackets.clear();
+        return knownPointPackets;
+    }
 
     @Override
     public void run() {
@@ -69,6 +74,12 @@ public class HandlerPeer extends Thread {
             os = socket.getOutputStream();
             InputStream buffer = socket.getInputStream();
             byte[] bufferData;
+
+            bufferData = new byte[HardwareAddress.BYTES];
+
+            buffer.read(bufferData);
+            initMessage(new Message(bufferData));
+
             while (!stop) {
                 bufferData = new byte[PointPacket.BYTES];
                 buffer.read(bufferData);
@@ -78,8 +89,16 @@ public class HandlerPeer extends Thread {
             e.printStackTrace();
         } finally {
             server.getHandlers().remove(this);
+            System.out.println("Handler unregistered");
             System.out.println("Handler Closed");
         }
+
+    }
+
+    public void initMessage(Message message) {
+        server.getHandlers().put(message.getHardwareAddress(),this);
+        System.out.println("Handler registered");
+        //System.out.println(message.getHardwareAddress());
 
     }
 
@@ -97,30 +116,33 @@ public class HandlerPeer extends Thread {
 
     private void handleData(PointPacket pointPacket) {
 
+        pointPackets.add(pointPacket);
+
         float x = pointPacket.getPoint().getX();
         float y = pointPacket.getPoint().getY();
 
         switch (pointPacket.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                paint.setStrokeWidth(pointPacket.getPoint().getStroke());
-                paint.setColor(pointPacket.getPoint().getColor());
-                path.moveTo(x, y);
+                localPaint.setStrokeWidth(pointPacket.getPoint().getStroke());
+                localPaint.setColor(pointPacket.getPoint().getColor());
+                localPath.moveTo(x, y);
                 break;
             case MotionEvent.ACTION_MOVE:
                 myLineTo(x, y);
                 break;
             case MotionEvent.ACTION_UP:
                 myLineTo(x, y);
-                path.reset();
+                localPath.reset();
                 break;
         }
     }
 
-    private void myLineTo(float x, float y) {
-        path.lineTo(x, y);
-        path.moveTo(x,y);
-        getMainActivity().getDraw().getMyCanvas().drawPath(path,paint);
+    private synchronized void myLineTo(float x, float y) {
+        localPath.lineTo(x, y);
+        getMainActivity().getDraw().getMyCanvas().drawPath(localPath, localPaint);
         getMainActivity().getDraw().postInvalidate();
+        localPath.reset();
+        localPath.moveTo(x,y);
     }
 
     public void setStop(boolean stop) {

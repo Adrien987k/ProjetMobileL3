@@ -1,6 +1,7 @@
 package com.example.adrien.projetmobilel3.server;
 
 import com.example.adrien.projetmobilel3.MainActivity;
+import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Point;
 
@@ -10,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by MrkJudge on 24/02/2017.
@@ -19,7 +21,7 @@ public class ServerP2P extends Thread {
 
     public static final int DEFAULT_PORT = 47856;
 
-    private final ArrayList<HandlerPeer> handlers = new ArrayList<>();
+    private final HashMap<HardwareAddress,HandlerPeer> handlers = new HashMap<>();
 
     private PointSynchronizer synchronizer;
 
@@ -59,7 +61,7 @@ public class ServerP2P extends Thread {
         }
     }
 
-    public ArrayList<HandlerPeer> getHandlers() {
+    public HashMap<HardwareAddress,HandlerPeer> getHandlers() {
         return handlers;
     }
 
@@ -73,7 +75,7 @@ public class ServerP2P extends Thread {
 
     public void setStop(boolean stop) {
         this.stop = stop;
-        for(HandlerPeer handler: handlers)
+        for(HandlerPeer handler: handlers.values())
             handler.setStop(stop);
     }
 

@@ -67,15 +67,23 @@ public class Draw extends   View {
                 path.moveTo(x, y);
                 break;
             case MotionEvent.ACTION_MOVE:
-                path.lineTo(x, y);
+                myLineTo(x, y);
                 break;
             case MotionEvent.ACTION_UP:
-                path.lineTo(x, y);
+                myLineTo(x, y);
                 myCanvas.drawPath(path, paint);
                 path.reset();
                 break;
         }
         postInvalidate();
+    }
+
+    private synchronized void myLineTo(float x, float y) {
+        path.lineTo(x, y);
+        myCanvas.drawPath(path,paint);
+        postInvalidate();
+        path.reset();
+        path.moveTo(x,y);
     }
 
     @Override

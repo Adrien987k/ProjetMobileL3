@@ -1,18 +1,18 @@
 package com.example.adrien.projetmobilel3.client;
 
 import android.content.Context;
-import android.drm.DrmStore;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.net.ConnectivityManager;
-import android.os.AsyncTask;
 import android.view.MotionEvent;
 
 import com.example.adrien.projetmobilel3.MainActivity;
+import com.example.adrien.projetmobilel3.common.DrawTools;
+import com.example.adrien.projetmobilel3.common.HardwareAddress;
+import com.example.adrien.projetmobilel3.common.Message;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
-import com.example.adrien.projetmobilel3.draw.Point;
+import com.example.adrien.projetmobilel3.draw.Draw;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
 import java.io.IOException;
@@ -21,9 +21,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.concurrent.ThreadFactory;
+import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * Created by MrkJudge on 08/03/2017.
@@ -35,25 +34,29 @@ public class ClientPeer extends Thread implements PointTransmission {
     private OutputStream os;
 
     private MainActivity mainActivity;
+    private HardwareAddress hardwareAddress;
     private InetAddress serverAddress;
 
-    private Path path = new Path();
-    private Paint paint = new Paint();
+    private final TreeMap<HardwareAddress,DrawTools> otherUsers = new TreeMap<>();
+
+    private Path localPath = new Path();
+    private Paint localPaint = new Paint();
 
     private boolean stop = false;
 
-    public ClientPeer(MainActivity mainActivity, InetAddress serverAddress) {
+    public ClientPeer(MainActivity mainActivity, InetAddress serverAddress, HardwareAddress hardwareAddress) {
         this.mainActivity = mainActivity;
         this.serverAddress = serverAddress;
+        this.hardwareAddress = hardwareAddress;
         init();
         start();
     }
 
     private void init() {
-        paint.setAntiAlias(true);
-        paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeJoin(Paint.Join.ROUND);
-        paint.setStrokeCap(Paint.Cap.ROUND);
+        localPaint.setAntiAlias(true);
+        localPaint.setStyle(Paint.Style.STROKE);
+        localPaint.setStrokeJoin(Paint.Join.ROUND);
+        localPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     @Override
@@ -66,9 +69,10 @@ public class ClientPeer extends Thread implements PointTransmission {
             socket = null;
             try {
                 socket = new Socket(serverAddress, ServerP2P.DEFAULT_PORT);
-                os = socket.getOutputStream();
-                System.out.println("Socket created, client side");
                 this.os = socket.getOutputStream();
+                os.write(new Message(hardwareAddress).getBytes());
+                System.out.println("Socket created, client side");
+                //System.out.println(hardwareAddress);
             } catch (IOException e) {
                 e.printStackTrace();
                 return;
@@ -93,9 +97,29 @@ public class ClientPeer extends Thread implements PointTransmission {
     }
 
 
-    private void handleData(PointPacket pointPacket) {
+    private synchronized void handleData(PointPacket pointPacket) {
+        HardwareAddress hardwareAddressReceived = pointPacket.getHardwareAddress();
+        //System.out.println("User " + hardwareAddressReceived + " received. Known: " + otherUsers.containsKey(hardwareAddressReceived));
+        /*if(hardwareAddressReceived.equals(this.getHardwareAddress())) {
+            drawPointPacket(new DrawTools(localPath,localPaint),pointPacket);
+        } else */
+        if(!hardwareAddressReceived.equals(hardwareAddress)) {
+            if (otherUsers.containsKey(hardwareAddressReceived)) {
+                System.out.println("User " + hardwareAddressReceived + " received. Known: " + otherUsers.containsKey(hardwareAddressReceived));
+                drawPointPacket(otherUsers.get(hardwareAddressReceived), pointPacket);
+            } else {
+                otherUsers.put(new HardwareAddress(hardwareAddressReceived.getBytes()), new DrawTools());
+                System.out.println("User " + hardwareAddressReceived + " registered");
+                drawPointPacket(otherUsers.get(hardwareAddressReceived), pointPacket);
+            }
+        }
+    }
+
+    private synchronized void drawPointPacket(DrawTools drawTools, PointPacket pointPacket) {
         float x = pointPacket.getPoint().getX();
         float y = pointPacket.getPoint().getY();
+        Path path = drawTools.getPath();
+        Paint paint = drawTools.getPaint();
 
         switch (pointPacket.getAction()) {
             case MotionEvent.ACTION_DOWN:
@@ -104,24 +128,34 @@ public class ClientPeer extends Thread implements PointTransmission {
                 path.moveTo(x, y);
                 break;
             case MotionEvent.ACTION_MOVE:
-                myLineTo(x, y);
+                myLineTo(x, y, drawTools);
                 break;
             case MotionEvent.ACTION_UP:
-                myLineTo(x, y);
+                myLineTo(x, y, drawTools);
                 path.reset();
                 break;
         }
     }
 
-    private void myLineTo(float x, float y) {
+    private synchronized void myLineTo(float x, float y, DrawTools drawTools) {
+        Path path = drawTools.getPath();
+        Paint paint = drawTools.getPaint();
+
         path.lineTo(x, y);
+        getDraw().getMyCanvas().drawPath(path, paint);
+        getDraw().postInvalidate();
+        path.reset();
         path.moveTo(x,y);
-        getMainActivity().getDraw().getMyCanvas().drawPath(path,paint);
-        getMainActivity().getDraw().postInvalidate();
     }
 
     private MainActivity getMainActivity() {
         return mainActivity;
+    }
+    private Draw getDraw() {
+        return getMainActivity().getDraw();
+    }
+    private HardwareAddress getHardwareAddress() {
+        return getMainActivity().getHardwareAddress();
     }
 
     @Override

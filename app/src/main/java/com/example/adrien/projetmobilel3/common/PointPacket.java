@@ -10,14 +10,19 @@ import java.nio.ByteBuffer;
 
 public class PointPacket {
 
-    public static final int BYTES = Point.BYTES + (Integer.SIZE / Byte.SIZE);
+    public static final int BYTES = Point.BYTES + (Integer.SIZE / Byte.SIZE) + HardwareAddress.BYTES;
 
     private Point point;
     private int action;
+    private HardwareAddress hardwareAddress;
 
-    public PointPacket(Point point, int action) {
+    private PointPacket(Point point, int action) {
         this.point = point;
         this.action = action;
+    }
+    public PointPacket(Point point, int action, HardwareAddress hardwareAddress) {
+        this(point,action);
+        this.hardwareAddress = hardwareAddress;
     }
 
     public PointPacket(byte[] bytes) {
@@ -25,6 +30,7 @@ public class PointPacket {
 
         this.point = new Point(buffer.getFloat(),buffer.getFloat(),buffer.getInt(),buffer.getInt());
         this.action = buffer.getInt();
+        this.hardwareAddress = HardwareAddress.parseHardwareAddress(buffer);
     }
 
     public byte[] getBytes() {
@@ -32,6 +38,7 @@ public class PointPacket {
 
         buffer.put(point.getBytes());
         buffer.putInt(action);
+        buffer.put(hardwareAddress.getBytes());
 
         return buffer.array();
     }
@@ -39,9 +46,11 @@ public class PointPacket {
     public Point getPoint() {
         return point;
     }
-
     public int getAction() {
         return action;
+    }
+    public HardwareAddress getHardwareAddress() {
+        return hardwareAddress;
     }
 
 

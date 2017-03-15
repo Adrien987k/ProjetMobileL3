@@ -1,16 +1,12 @@
 package com.example.adrien.projetmobilel3.server;
 
-import com.example.adrien.projetmobilel3.MainActivity;
+import com.example.adrien.projetmobilel3.activities.MainActivity;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
-import com.example.adrien.projetmobilel3.common.PointTransmission;
-import com.example.adrien.projetmobilel3.draw.Point;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**

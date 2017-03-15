@@ -1,13 +1,9 @@
 package com.example.adrien.projetmobilel3.draw;
 
-import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.example.adrien.projetmobilel3.MainActivity;
-
 import java.nio.ByteBuffer;
-import java.nio.charset.MalformedInputException;
 
 /**
  * Created by MrkJudge on 24/02/2017.

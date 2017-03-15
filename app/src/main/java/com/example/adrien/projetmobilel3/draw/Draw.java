@@ -91,6 +91,9 @@ public class Draw extends   View {
         super.onSizeChanged(w, h, oldw, oldh);
         bitMap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         myCanvas = new Canvas(bitMap);
+        myCanvas.drawColor(Color.WHITE);
+        postInvalidate();
+
     }
 
     //TODO ordre incorrect, les points étrangers seront toujours dessinés par dessus

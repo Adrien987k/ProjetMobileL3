@@ -6,7 +6,7 @@ import android.graphics.Path;
 import android.net.ConnectivityManager;
 import android.view.MotionEvent;
 
-import com.example.adrien.projetmobilel3.MainActivity;
+import com.example.adrien.projetmobilel3.activities.MainActivity;
 import com.example.adrien.projetmobilel3.common.DrawTools;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.Message;
@@ -21,7 +21,6 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
@@ -105,11 +104,9 @@ public class ClientPeer extends Thread implements PointTransmission {
         } else */
         if(!hardwareAddressReceived.equals(hardwareAddress)) {
             if (otherUsers.containsKey(hardwareAddressReceived)) {
-                System.out.println("User " + hardwareAddressReceived + " received. Known: " + otherUsers.containsKey(hardwareAddressReceived));
                 drawPointPacket(otherUsers.get(hardwareAddressReceived), pointPacket);
             } else {
                 otherUsers.put(new HardwareAddress(hardwareAddressReceived.getBytes()), new DrawTools());
-                System.out.println("User " + hardwareAddressReceived + " registered");
                 drawPointPacket(otherUsers.get(hardwareAddressReceived), pointPacket);
             }
         }

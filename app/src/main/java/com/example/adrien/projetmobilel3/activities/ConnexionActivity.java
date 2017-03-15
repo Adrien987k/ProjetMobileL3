@@ -1,5 +1,6 @@
-package com.example.adrien.projetmobilel3;
+package com.example.adrien.projetmobilel3.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,7 +13,7 @@ import com.example.adrien.projetmobilel3.R;
 
 import java.util.ArrayList;
 
-public class ConnexionActivity extends AppCompatActivity {
+public class ConnexionActivity extends Activity {
 
     private ArrayList<String> peers = new ArrayList<>();
 
@@ -57,5 +58,10 @@ public class ConnexionActivity extends AppCompatActivity {
         finish();
     }
 
+
+    @Override
+    public void onBackPressed() {
+
+    }
 }
 

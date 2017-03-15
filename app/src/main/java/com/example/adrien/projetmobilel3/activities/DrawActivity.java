@@ -1,4 +1,4 @@
-package com.example.adrien.projetmobilel3;
+package com.example.adrien.projetmobilel3.activities;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -15,17 +15,26 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 
+import com.example.adrien.projetmobilel3.R;
+import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.PointPacket;
+import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
 import com.example.adrien.projetmobilel3.draw.Point;
 
+@Deprecated
 public class DrawActivity extends Activity {
+
+
+    private Draw draw;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_draw);
+
        /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);*/
         /*setSupportActionBar(toolbar);*/
 
@@ -39,21 +48,11 @@ public class DrawActivity extends Activity {
             }
         });*/
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, null, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
-        Draw draw = (Draw) findViewById(R.id.draw_content);
-        draw.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                ((Draw) v).addEvent(event);
-                return true;
-            }
-        });
 
         /*
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);

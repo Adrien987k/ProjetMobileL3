@@ -1,53 +1,30 @@
-package com.example.adrien.projetmobilel3;
+package com.example.adrien.projetmobilel3.activities;
 
-import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.net.ConnectivityManager;
-import android.net.Network;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
-import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 //import android.util.Log;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v7.app.NotificationCompat;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.example.adrien.projetmobilel3.R;
 import com.example.adrien.projetmobilel3.client.ClientPeer;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
-import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
-import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
-
-import static android.content.Context.NOTIFICATION_SERVICE;
-import static android.net.ConnectivityManager.TYPE_WIFI;
 
 /**
  * Created by Adrien on 20/02/2017.
@@ -87,12 +64,15 @@ public class Receiver extends BroadcastReceiver {
                 peersName.add(device.deviceName);
             }
 
-            Intent intent = new Intent(mainActivity,ConnexionActivity.class);
+            if(!mainActivity.connected) {
+                Intent intent = new Intent(mainActivity, ConnexionActivity.class);
 
-            String[] names = peersName.toArray(new String[peersName.size()]);
-            intent.putExtra("peersName",names);
+                String[] names = peersName.toArray(new String[peersName.size()]);
+                intent.putExtra("peersName", names);
 
-            mainActivity.startActivityForResult(intent,1);
+                mainActivity.startActivityForResult(intent, 1);
+                mainActivity.loadingDisplay(false);
+            }
 
             if(peers.size() == 0){
                 //as.add("No device found");
@@ -138,11 +118,12 @@ public class Receiver extends BroadcastReceiver {
                     // One common case is creating a group owner thread and accepting
                     // incoming connections.
                 } else {
-                    Toast.makeText(mainActivity, "client", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(mainActivity, "connected", Toast.LENGTH_SHORT).show();
                     if(mainActivity.getTransmission() != null)
                         mainActivity.getTransmission().setStop(true);
                     if(hardwareAddress != null) {
                         mainActivity.setTransmission(new ClientPeer(mainActivity, info.groupOwnerAddress, hardwareAddress));
+                        mainActivity.connected = true;
                     }
                     else {
                         try {

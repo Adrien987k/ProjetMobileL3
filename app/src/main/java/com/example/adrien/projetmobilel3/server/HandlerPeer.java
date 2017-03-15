@@ -4,7 +4,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.view.MotionEvent;
 
-import com.example.adrien.projetmobilel3.MainActivity;
+import com.example.adrien.projetmobilel3.activities.MainActivity;
 import com.example.adrien.projetmobilel3.common.DrawTools;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.Message;

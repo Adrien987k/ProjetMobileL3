@@ -102,7 +102,14 @@ public class Receiver extends BroadcastReceiver {
 
         @Override
         public void onFailure(int reason) {
-            Toast.makeText(mainActivity, "Discover failed. Check your WIFI connexion", Toast.LENGTH_SHORT).show();
+            Toast.makeText(mainActivity, "No peer found. Check your WIFI connexion", Toast.LENGTH_SHORT).show();
+
+            Intent intent = new Intent(mainActivity, ConnexionActivity.class);
+            String[] names = new String[0];
+            intent.putExtra("peersName",names);
+
+            mainActivity.startActivityForResult(intent, 1);
+            mainActivity.loadingDisplay(false);
         }
     };
 

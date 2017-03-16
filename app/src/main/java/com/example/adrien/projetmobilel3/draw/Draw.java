@@ -21,10 +21,10 @@ import java.util.TreeMap;
 
 public class Draw extends   View {
 
-    public static int color;
+    public int color;
     public static final int DEFAULT_COLOR = Color.BLACK;
 
-    public static int stroke;
+    public int stroke;
     public static final int DEFAULT_STROKE = 1;
 
     private Paint paint = new Paint();
@@ -34,8 +34,8 @@ public class Draw extends   View {
 
     private Draw(Context context, AttributeSet attrs, int color, int stroke) {
         super(context,attrs);
-        Draw.color = color;
-        Draw.stroke = stroke;
+        this.color = color;
+        this.stroke = stroke;
         init();
     }
 
@@ -65,6 +65,7 @@ public class Draw extends   View {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 path.moveTo(x, y);
+                paint.setColor(color);
                 break;
             case MotionEvent.ACTION_MOVE:
                 myLineTo(x, y);
@@ -96,13 +97,9 @@ public class Draw extends   View {
 
     }
 
-    //TODO ordre incorrect, les points étrangers seront toujours dessinés par dessus
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
-        paint.setColor(Color.BLUE);
-        paint.setStrokeWidth(30);
 
         canvas.drawBitmap(bitMap,0,0,paint);
         canvas.drawPath(path,paint);

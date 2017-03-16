@@ -9,9 +9,13 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
+import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.util.Xml;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -27,6 +31,15 @@ import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
 import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
+
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserFactory;
+
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.util.ArrayList;
 
 public class MainActivity extends Activity {
 
@@ -52,14 +65,13 @@ public class MainActivity extends Activity {
         final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_main);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, null, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
+        drawer.addDrawerListener(toggle);
         toggle.syncState();
 
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-
 
 
 
@@ -70,7 +82,7 @@ public class MainActivity extends Activity {
 
                 ((Draw) v).addEvent(event);
                 if(transmission != null)
-                    transmission.addPointPacket(new PointPacket(new Point(event.getX(),event.getY(),20, Color.RED),event.getAction(),receiver.getHardwareAddress()));
+                    transmission.addPointPacket(new PointPacket(new Point(event.getX(),event.getY(),20, draw.color),event.getAction(),receiver.getHardwareAddress()));
                 return true;
             }
         });
@@ -82,6 +94,8 @@ public class MainActivity extends Activity {
                 MainActivity.this.getDraw().clear();
             }
         });
+
+        initColorButtons();
 
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
@@ -95,7 +109,6 @@ public class MainActivity extends Activity {
         super.onResume();
         receiver = new Receiver(wifiP2pManager, channel, this);
         registerReceiver(receiver, intentFilter);
-       // wifiP2pManager.discoverPeers(channel,receiver.discoverThenConnect);
         wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
@@ -163,6 +176,45 @@ public class MainActivity extends Activity {
         } else {
             findViewById(R.id.loading).setVisibility(View.INVISIBLE);
         }
+    }
+
+    private void initColorButtons() {
+        ArrayList<Button> colorButtons = new ArrayList<>();
+
+        colorButtons.add((Button)findViewById(R.id.button_color1));
+        colorButtons.add((Button)findViewById(R.id.button_color2));
+        colorButtons.add((Button)findViewById(R.id.button_color3));
+        colorButtons.add((Button)findViewById(R.id.button_color4));
+        colorButtons.add((Button)findViewById(R.id.button_color5));
+        colorButtons.add((Button)findViewById(R.id.button_color6));
+        colorButtons.add((Button)findViewById(R.id.button_color7));
+        colorButtons.add((Button)findViewById(R.id.button_color8));
+        colorButtons.add((Button)findViewById(R.id.button_color9));
+        colorButtons.add((Button)findViewById(R.id.button_color10));
+        colorButtons.add((Button)findViewById(R.id.button_color11));
+        colorButtons.add((Button)findViewById(R.id.button_color12));
+
+        for(Button button: colorButtons) {
+           button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Button selectedColor = (Button) findViewById(R.id.selected_color);
+                    String colorString = ((Button) view).getText().toString();
+                    int color = Color.parseColor(colorString);
+                    draw.color = color;
+
+                    selectedColor.setBackgroundColor(color);
+                }
+            });
+
+        }
+    }
+
+    public void onCLickColorButton(View v) {
+        Button selectedColor = (Button) findViewById(R.id.selected_color);
+        String color = ((Button) v).getText().toString();
+
+        selectedColor.setBackgroundColor(Color.parseColor(color));
     }
 
     @Override

@@ -1,9 +1,26 @@
 <resources>
-    <string name="app_name">Projet Mobile L3</string>
+    <string name="app_name">LetsDraw</string>
     <string name="title_activity_draw">DrawActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="red">#FF0000</string>
+    <string name="green">#00FF00</string>
+    <string name="blue">#0000FF</string>
+    <string name="yellow">#FFFF00</string>
+    <string name="cyan">#00FFFF</string>
+    <string name="pink">#FF00FF</string>
+    <string name="brown">#663300</string>
+    <string name="violet">#990099</string>
+    <string name="orange">#FF6600</string>
+    <string name="black">#000000</string>
+    <string name="white">#FFFFFF</string>
+    <string name="grey">#808080</string>
+
+    <string name="thickness">Thickness</string>
+    <string name="transparency">Transparency</string>
+
 </resources>

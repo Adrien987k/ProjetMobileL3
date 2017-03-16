@@ -33,13 +33,6 @@
             android:layout_below="@+id/refresh_button" />
     </RelativeLayout>
 
-    <android.support.design.widget.NavigationView
-        android:id="@+id/nav_view"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        app:headerLayout="@layout/nav_header_draw" />
-
     <RelativeLayout
         android:id="@+id/loading"
         android:background="@drawable/side_nav_bar"
@@ -72,40 +65,249 @@
 
     </RelativeLayout>
 
-    <!--
-    <Button
-        android:text="Discover"
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/discover_button"
-        android:layout_marginStart="67dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_height="match_parent"
+        android:layout_gravity="start">
+        <!--app:headerLayout="@layout/nav_header_draw"-->
 
-    <Button
-        android:text="Connect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/connect_button"
-        android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/group_info_button"
-        android:layout_marginStart="39dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="600dp"
+            android:gravity="top"
+            android:orientation="vertical"
+            android:paddingTop="@dimen/activity_vertical_margin"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:weightSum="1">
 
-     <Button
-    android:text="Send to Group Owner"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/send_to_group_owner"
-    android:layout_alignBaseline="@+id/group_info_button"
-    android:layout_alignBottom="@+id/group_info_button"
-    android:layout_toEndOf="@+id/group_info_button" />
 
-    <TextView
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_below="@+id/send_to_group_owner"
-    android:layout_alignParentEnd="true"
-    android:id="@+id/sendStatus" />
-    -->
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.04"
+                android:background="@drawable/side_nav_bar"
+                android:fontFamily="casual"
+                android:paddingTop="@dimen/nav_header_vertical_spacing"
+                android:text="@string/app_name"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+                android:textColor="@android:color/black"
+                android:textSize="50sp"
+                android:textStyle="bold"
+                android:typeface="normal" />
 
-</android.support.v4.widget.DrawerLayout>
+            <Button
+                android:id="@+id/selected_color"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginBottom="3dp"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginTop="9dp"
+                android:layout_weight="0.14"
+                android:background="@drawable/button_main_color" />
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:columnCount="3"
+                android:rowCount="4">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color1"
+                    android:id="@+id/button_color1"
+                    android:text="@string/red"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:id="@+id/button_color2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color2"
+                    android:text="@string/green"
+                    android:textColor="@color/invisible_color" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color3"
+                    android:id="@+id/button_color3"
+                    android:text="@string/blue"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color4"
+                    android:id="@+id/button_color4"
+                    android:text="@string/yellow"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color5"
+                    android:id="@+id/button_color5"
+                    android:text="@string/pink"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color6"
+                    android:id="@+id/button_color6"
+                    android:text="@string/cyan"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color7"
+                    android:id="@+id/button_color7"
+                    android:text="@string/brown"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color8"
+                    android:id="@+id/button_color8"
+                    android:text="@string/violet"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color9"
+                    android:id="@+id/button_color9"
+                    android:text="@string/orange"
+                    android:textColor="@color/invisible_color"/>
+                //android:onClick="onCLickColorButton"
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color10"
+                    android:id="@+id/button_color10"
+                    android:text="@string/black"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color11"
+                    android:id="@+id/button_color11"
+                    android:text="@string/grey"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/button_color12"
+                    android:id="@+id/button_color12"
+                    android:text="@string/white"
+                    android:textColor="@color/invisible_color"/>
+                <!--android:onClick="onCLickColorButton"-->
+
+
+            </GridLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.10"
+                android:fontFamily="casual"
+                android:gravity="center"
+                android:text="@string/thickness"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                style="@android:style/Widget.DeviceDefault.Light.SeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.10"
+                android:background="@android:color/background_light"
+                android:visibility="visible" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.10"
+                android:fontFamily="casual"
+                android:gravity="center"
+                android:text="@string/transparency"
+                android:textAlignment="center"
+                android:textColor="@android:color/black"
+                android:textSize="20sp" />
+
+            <SeekBar
+                android:id="@+id/seekBar2"
+                style="@android:style/Widget.DeviceDefault.Light.SeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.10"
+                android:background="@android:color/background_light" />
+        </LinearLayout>
+    </android.support.design.widget.NavigationView>
+    </android.support.v4.widget.DrawerLayout>
+
+
+            <!--
+            <Button
+                android:text="Discover"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/discover_button"
+                android:layout_marginStart="67dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true" />
+
+            <Button
+                android:text="Connect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/connect_button"
+                android:layout_alignParentTop="true"
+                android:layout_toEndOf="@+id/group_info_button"
+                android:layout_marginStart="39dp" />
+
+             <Button
+            android:text="Send to Group Owner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/send_to_group_owner"
+            android:layout_alignBaseline="@+id/group_info_button"
+            android:layout_alignBottom="@+id/group_info_button"
+            android:layout_toEndOf="@+id/group_info_button" />
+
+            <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/send_to_group_owner"
+            android:layout_alignParentEnd="true"
+            android:id="@+id/sendStatus" />
+            -->
+

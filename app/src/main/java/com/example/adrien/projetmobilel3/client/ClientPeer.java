@@ -89,7 +89,6 @@ public class ClientPeer extends Thread implements PointTransmission {
         }
             System.out.println("Socket Closed, client side");
         }
-        destroy();
     }
 
 

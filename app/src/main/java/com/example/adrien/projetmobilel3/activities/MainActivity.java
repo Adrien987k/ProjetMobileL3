@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.adrien.projetmobilel3.R;
 import com.example.adrien.projetmobilel3.common.DrawTools;
@@ -173,6 +174,7 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         setStop(true);
+        wifiP2pManager.removeGroup(channel,null);
     }
 
     @Override
@@ -190,6 +192,11 @@ public class MainActivity extends Activity {
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled){
         this.isWifiP2pEnabled = isWifiP2pEnabled;
+        if(isWifiP2pEnabled) {
+           // Toast.makeText(this, "WIFI P2P enabled.", Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, "WIFI P2P disabled.", Toast.LENGTH_SHORT).show();
+
     }
 
     public void setTransmission(PointTransmission transmission) {
@@ -358,6 +365,7 @@ public class MainActivity extends Activity {
                 setConnected(true);
                 //connexionMode = SERVER;
             } else {
+                startConnexionActivity = false;
                 receiver.connect(data.getStringExtra("deviceName"));
                 /*if(connected)
                     connexionMode = CLIENT;*/
@@ -403,6 +411,7 @@ public class MainActivity extends Activity {
 
         String[] names = peersName;
         intent.putExtra("peersName", names);
+        intent.putExtra("isWifiP2pEnabled",isWifiP2pEnabled);
 
         mainActivity.startActivityForResult(intent, 1);
         mainActivity.loadingDisplay(false);

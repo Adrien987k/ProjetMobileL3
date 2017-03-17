@@ -21,16 +21,22 @@
         android:label="LetsDraw"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.MainActivity">
+        <activity android:name=".activities.MainActivity"
+            android:screenOrientation="portrait"
+            android:configChanges="orientation|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".activities.DrawActivity" />
-        <activity android:name=".activities.ConnexionActivity"></activity>
+        <activity android:name=".activities.ConnexionActivity" />
 
-
+        <service
+            android:name=".services.NetworkP2PServer"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

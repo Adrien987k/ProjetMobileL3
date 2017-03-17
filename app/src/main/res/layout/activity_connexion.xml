@@ -14,16 +14,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/peersList"
-        android:layout_below="@+id/server_mode"
-        android:layout_alignParentStart="true" />
+        android:layout_toStartOf="@+id/radioButton" />
     <Button
         android:id="@+id/local_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Local Mode"
         android:onClick="onClickLocalMode"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_marginTop="37dp"
+        android:layout_below="@+id/discover_button"
+        android:layout_toEndOf="@+id/peersList" />
 
     <Button
         android:id="@+id/server_mode"
@@ -31,12 +31,9 @@
         android:layout_height="wrap_content"
         android:text="Server Mode"
         android:onClick="onClickServerMode"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@id/local_mode"
-        android:layout_marginEnd="10dp"/>
-
-
+        android:layout_below="@+id/local_mode"
+        android:layout_toEndOf="@+id/peersList"
+        android:layout_marginTop="36dp" />
 
     <Button
         android:id="@+id/discover_button"
@@ -44,9 +41,20 @@
         android:layout_height="wrap_content"
         android:onClick="onClickRefresh"
         android:text="@string/refresh"
+        android:layout_marginTop="27dp"
+        android:layout_below="@+id/radioButton"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/peersList" />
+
+    <RadioButton
+        android:id="@+id/radioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@+id/local_mode"
-        android:layout_marginStart="10dp" />
+        android:checked="true"
+        android:clickable="false"
+        android:text="WIFI P2P" />
 
 
 </RelativeLayout>

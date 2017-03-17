@@ -40,6 +40,9 @@ public class ClientPeer extends Thread implements PointTransmission {
     private boolean stop = false;
     private boolean connexionEstablished = false;
 
+
+    //TODO not working
+    private boolean connexionAttempt = false;
     public ClientPeer(MainActivity mainActivity, InetAddress serverAddress, HardwareAddress hardwareAddress) {
         this.mainActivity = mainActivity;
         this.serverAddress = serverAddress;
@@ -61,13 +64,14 @@ public class ClientPeer extends Thread implements PointTransmission {
                 this.os = socket.getOutputStream();
                 os.write(new Message(hardwareAddress).getBytes());
                 System.out.println("Socket created, client side");
+                connexionAttempt = true;
                 //System.out.println(hardwareAddress);
             } catch (IOException e) {
+                connexionAttempt = true;
                 setStop(true);
                 e.printStackTrace();
                 return;
             }
-
 
         try {
             InputStream buffer = socket.getInputStream();
@@ -85,6 +89,7 @@ public class ClientPeer extends Thread implements PointTransmission {
         }
             System.out.println("Socket Closed, client side");
         }
+        destroy();
     }
 
 
@@ -170,6 +175,7 @@ public class ClientPeer extends Thread implements PointTransmission {
     }
 
     public boolean connexionEstablished() {
+        while (!connexionAttempt) {}
         return connexionEstablished;
     }
 

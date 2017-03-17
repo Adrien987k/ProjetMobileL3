@@ -56,6 +56,7 @@ public class MainActivity extends Activity {
     public final MainActivity mainActivity = this;
     public boolean connected = false;
     private boolean drawable = false;
+    private boolean startConnexionActivity = true;
 
     private Draw draw;
 
@@ -363,8 +364,11 @@ public class MainActivity extends Activity {
             }
         } else {
             connexionMode = LOCAL;
+            setConnected(true);
             return;
         }
+        System.out.println("in MainActivity: " + mainActivity.getConnected());
+
 /*
         System.out.println("in ActivityResult: " + connected);
         if(getConnected())
@@ -377,22 +381,27 @@ public class MainActivity extends Activity {
 
     private void serverNotConnected() {
         loadingDisplay(true);
+        startConnexionActivity = false;
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
         alert.setTitle("Connexion failed !")
                 .setMessage("Make sure the group owner is connected in Server Mode.")
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        startConnexionActivity = true;
                         wifiP2pManager.discoverPeers(channel,receiver.discover);
                     }
                 })
                 .show();
     }
 
-    public void startConnexionActivity() {
+    public void startConnexionActivity(String[] peersName) {
+        if(!startConnexionActivity)
+            return;
+
         Intent intent = new Intent(mainActivity, ConnexionActivity.class);
 
-        String[] names = receiver.getPeersName().toArray(new String[receiver.getPeersName().size()]);
+        String[] names = peersName;
         intent.putExtra("peersName", names);
 
         mainActivity.startActivityForResult(intent, 1);

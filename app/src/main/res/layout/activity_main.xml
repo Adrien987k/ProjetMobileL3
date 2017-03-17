@@ -12,9 +12,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginEnd="0dp"
-        android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
-        android:layout_marginTop="0dp">
+        android:layout_marginTop="0dp"
+        android:background="@color/lightgrey">
 
         <Button
             android:id="@+id/refresh_button"
@@ -30,7 +30,10 @@
             android:layout_height="match_parent"
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
-            android:layout_below="@+id/refresh_button" />
+            android:layout_below="@+id/refresh_button"
+            android:layout_margin="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -238,18 +241,19 @@
                 android:layout_weight="0.10"
                 android:fontFamily="casual"
                 android:gravity="center"
-                android:text="@string/thickness"
+                android:text="@string/stroke"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
                 android:textSize="20sp" />
 
             <SeekBar
-                android:id="@+id/seekBar"
+                android:id="@+id/stroke_bar"
                 style="@android:style/Widget.DeviceDefault.Light.SeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.10"
                 android:background="@android:color/background_light"
+                android:progress="30"
                 android:visibility="visible" />
 
             <TextView
@@ -261,15 +265,19 @@
                 android:text="@string/transparency"
                 android:textAlignment="center"
                 android:textColor="@android:color/black"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                android:visibility="invisible" />
 
             <SeekBar
-                android:id="@+id/seekBar2"
+                android:id="@+id/trans_bar"
                 style="@android:style/Widget.DeviceDefault.Light.SeekBar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.10"
-                android:background="@android:color/background_light" />
+                android:background="@android:color/background_light"
+                android:max="255"
+                android:progress="255"
+                android:visibility="invisible" />
         </LinearLayout>
     </android.support.design.widget.NavigationView>
     </android.support.v4.widget.DrawerLayout>

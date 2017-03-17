@@ -7,6 +7,7 @@ import android.net.ConnectivityManager;
 import android.view.MotionEvent;
 
 import com.example.adrien.projetmobilel3.activities.MainActivity;
+import com.example.adrien.projetmobilel3.activities.Receiver;
 import com.example.adrien.projetmobilel3.common.DrawTools;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.Message;
@@ -36,26 +37,14 @@ public class ClientPeer extends Thread implements PointTransmission {
     private HardwareAddress hardwareAddress;
     private InetAddress serverAddress;
 
-    private final TreeMap<HardwareAddress,DrawTools> otherUsers = new TreeMap<>();
-
-    private Path localPath = new Path();
-    private Paint localPaint = new Paint();
-
     private boolean stop = false;
+    private boolean connexionEstablished = false;
 
     public ClientPeer(MainActivity mainActivity, InetAddress serverAddress, HardwareAddress hardwareAddress) {
         this.mainActivity = mainActivity;
         this.serverAddress = serverAddress;
         this.hardwareAddress = hardwareAddress;
-        init();
         start();
-    }
-
-    private void init() {
-        localPaint.setAntiAlias(true);
-        localPaint.setStyle(Paint.Style.STROKE);
-        localPaint.setStrokeJoin(Paint.Join.ROUND);
-        localPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
     @Override
@@ -68,14 +57,17 @@ public class ClientPeer extends Thread implements PointTransmission {
             socket = null;
             try {
                 socket = new Socket(serverAddress, ServerP2P.DEFAULT_PORT);
+                connexionEstablished = true;
                 this.os = socket.getOutputStream();
                 os.write(new Message(hardwareAddress).getBytes());
                 System.out.println("Socket created, client side");
                 //System.out.println(hardwareAddress);
             } catch (IOException e) {
+                setStop(true);
                 e.printStackTrace();
                 return;
             }
+
 
         try {
             InputStream buffer = socket.getInputStream();
@@ -98,20 +90,17 @@ public class ClientPeer extends Thread implements PointTransmission {
 
     private synchronized void handleData(PointPacket pointPacket) {
         HardwareAddress hardwareAddressReceived = pointPacket.getHardwareAddress();
-        //System.out.println("User " + hardwareAddressReceived + " received. Known: " + otherUsers.containsKey(hardwareAddressReceived));
-        /*if(hardwareAddressReceived.equals(this.getHardwareAddress())) {
-            drawPointPacket(new DrawTools(localPath,localPaint),pointPacket);
-        } else */
+        getMainActivity().getDraw().getPoints().add(pointPacket);
         if(!hardwareAddressReceived.equals(hardwareAddress)) {
-            if (otherUsers.containsKey(hardwareAddressReceived)) {
-                drawPointPacket(otherUsers.get(hardwareAddressReceived), pointPacket);
+            if (getUsers().containsKey(hardwareAddressReceived)) {
+                getDraw().drawPointPacket(getUsers().get(hardwareAddressReceived), pointPacket);
             } else {
-                otherUsers.put(new HardwareAddress(hardwareAddressReceived.getBytes()), new DrawTools());
-                drawPointPacket(otherUsers.get(hardwareAddressReceived), pointPacket);
+                getUsers().put(new HardwareAddress(hardwareAddressReceived.getBytes()), new DrawTools());
+                getDraw().drawPointPacket(getUsers().get(hardwareAddressReceived), pointPacket);
             }
         }
     }
-
+/*
     private synchronized void drawPointPacket(DrawTools drawTools, PointPacket pointPacket) {
         float x = pointPacket.getPoint().getX();
         float y = pointPacket.getPoint().getY();
@@ -144,7 +133,7 @@ public class ClientPeer extends Thread implements PointTransmission {
         path.reset();
         path.moveTo(x,y);
     }
-
+*/
     private MainActivity getMainActivity() {
         return mainActivity;
     }
@@ -154,10 +143,14 @@ public class ClientPeer extends Thread implements PointTransmission {
     private HardwareAddress getHardwareAddress() {
         return getMainActivity().getHardwareAddress();
     }
+    private TreeMap<HardwareAddress,DrawTools> getUsers() {
+        return getMainActivity().getUsers();
+    }
 
     @Override
     public void setStop(boolean stop) {
         this.stop = stop;
+        connexionEstablished = false;
     }
 
     @Override
@@ -169,7 +162,15 @@ public class ClientPeer extends Thread implements PointTransmission {
             setStop(true);
         } catch (IOException e) {
             e.printStackTrace();
+            setStop(true);
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            setStop(true);
         }
+    }
+
+    public boolean connexionEstablished() {
+        return connexionEstablished;
     }
 
 

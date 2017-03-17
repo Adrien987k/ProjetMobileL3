@@ -20,7 +20,10 @@
     <string name="white">#FFFFFF</string>
     <string name="grey">#808080</string>
 
+    <string name="stroke">Stroke</string>
     <string name="thickness">Thickness</string>
     <string name="transparency">Transparency</string>
+
+    <string name="refresh">Refresh</string>
 
 </resources>

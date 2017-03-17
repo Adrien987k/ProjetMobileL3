@@ -1,6 +1,13 @@
 package com.example.adrien.projetmobilel3.server;
 
+import android.content.ComponentName;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.widget.Toast;
+
 import com.example.adrien.projetmobilel3.activities.MainActivity;
+import com.example.adrien.projetmobilel3.services.NetworkP2PServer;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 
 import java.io.IOException;
@@ -71,6 +78,7 @@ public class ServerP2P extends Thread {
 
     public void setStop(boolean stop) {
         this.stop = stop;
+        synchronizer.setStop(true);
         for(HandlerPeer handler: handlers.values())
             handler.setStop(stop);
     }

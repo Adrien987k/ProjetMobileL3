@@ -2,46 +2,48 @@ package com.example.adrien.projetmobilel3.activities;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.util.Xml;
+import android.support.v7.app.AlertDialog;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.RelativeLayout;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.example.adrien.projetmobilel3.R;
+import com.example.adrien.projetmobilel3.common.DrawTools;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
+import com.example.adrien.projetmobilel3.common.MyPath;
+import com.example.adrien.projetmobilel3.common.P2PServerFragment;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
 import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
+import com.example.adrien.projetmobilel3.services.NetworkP2PServer;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 public class MainActivity extends Activity {
+
+    public static final int LOCAL = 1;
+    public static final int SERVER = 2;
+    public static final int CLIENT = 3;
+    public static final int NONE = 0;
 
     private final IntentFilter intentFilter = new IntentFilter();
     private WifiP2pManager wifiP2pManager = null;
@@ -49,11 +51,16 @@ public class MainActivity extends Activity {
     private Receiver receiver = null;
     private PointTransmission transmission;
 
+    public int connexionMode = NONE;
     private boolean isWifiP2pEnabled = false;
     public final MainActivity mainActivity = this;
     public boolean connected = false;
+    private boolean drawable = false;
 
     private Draw draw;
+
+    private ArrayList<MyPath> paths = new ArrayList<>();
+    private final TreeMap<HardwareAddress,DrawTools> users = new TreeMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,19 +80,35 @@ public class MainActivity extends Activity {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
-
-
         draw = (Draw) findViewById(R.id.draw);
+        draw.setMainActivity(this);
         draw.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-
-                ((Draw) v).addEvent(event);
+                if(!drawable) {
+                    return false;
+                }
+                PointPacket pointPacket = new PointPacket(new Point(event.getX(),event.getY(),draw.stroke, draw.color),event.getAction(),receiver.getHardwareAddress());
+                ((Draw) v).addPointPacket(pointPacket,paths);
                 if(transmission != null)
-                    transmission.addPointPacket(new PointPacket(new Point(event.getX(),event.getY(),20, draw.color),event.getAction(),receiver.getHardwareAddress()));
+                    transmission.addPointPacket(pointPacket);
                 return true;
             }
         });
+
+
+        if(savedInstanceState != null) {
+            draw.color = savedInstanceState.getInt("color");
+            draw.stroke = savedInstanceState.getInt("stroke");
+            draw.alpha = savedInstanceState.getInt("alpha");
+            connexionMode = savedInstanceState.getInt("connexionMode");
+            ArrayList<HardwareAddress> usersHardwareAddress = savedInstanceState.getParcelableArrayList("usersHardwareAddress");
+            for (HardwareAddress address : usersHardwareAddress) {
+                users.put(address, new DrawTools());
+            }
+            ArrayList<PointPacket> points = savedInstanceState.getParcelableArrayList("points");
+            getDraw().setPoints(points);
+        }
 
         Button refreshButton = (Button) findViewById(R.id.refresh_button);
         refreshButton.setOnClickListener(new View.OnClickListener() {
@@ -96,6 +119,7 @@ public class MainActivity extends Activity {
         });
 
         initColorButtons();
+        initSeekBar();
 
         wifiP2pManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         channel = wifiP2pManager.initialize(this, getMainLooper(), null);
@@ -104,11 +128,20 @@ public class MainActivity extends Activity {
     }
 
     //TODO sauvegarde des données
+    //sauvegarde du serveur
+    //sauvegarde des points
     @Override
     public void onResume(){
         super.onResume();
+        //loadingDisplay(true);
         receiver = new Receiver(wifiP2pManager, channel, this);
         registerReceiver(receiver, intentFilter);
+
+        if(connexionMode == LOCAL) {
+            loadingDisplay(false);
+            return;
+        }
+/*
         wifiP2pManager.requestConnectionInfo(channel, new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
@@ -116,19 +149,22 @@ public class MainActivity extends Activity {
                     if(info.isGroupOwner) {
                         ServerP2P server = new ServerP2P(MainActivity.this);
                         setTransmission(server.getSynchronizer());
-
+                        connected = true;
+                        loadingDisplay(false);
                     } else {
-                     //   transmission = new ClientPeer(MainActivity.this, info.groupOwnerAddress);
+                         if(getHardwareAddress() != null) {
+                             //transmission = new ClientPeer(MainActivity.this, info.groupOwnerAddress,getHardwareAddress());
+                         }
                     }
                 }
             }
         });
+        */
     }
 
     @Override
     public void onPause(){
         super.onPause();
-        setStop(true);
         unregisterReceiver(receiver);
     }
 
@@ -136,6 +172,19 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
         setStop(true);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("color",draw.color);
+        outState.putInt("stroke",draw.stroke);
+        outState.putInt("alpha",draw.alpha);
+        outState.putInt("connexionMode",connexionMode);
+        //outState.putParcelableArrayList("paths",paths);
+        ArrayList<HardwareAddress> hardwareAddresses = new ArrayList<>(getUsers().keySet());
+        outState.putParcelableArrayList("usersHardwareAddress",hardwareAddresses);
+        outState.putParcelableArrayList("points",getPoints());
     }
 
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled){
@@ -155,9 +204,40 @@ public class MainActivity extends Activity {
     public HardwareAddress getHardwareAddress() {
         return receiver.getHardwareAddress();
     }
-
     public Draw getDraw() {
         return draw;
+    }
+    public Receiver getReceiver() {
+        return receiver;
+    }
+    public ArrayList<MyPath> getPaths() {
+        return paths;
+    }
+    public TreeMap<HardwareAddress,DrawTools> getUsers() {
+        return users;
+    }
+    public ArrayList<PointPacket> getPoints() {
+        return getDraw().getPoints();
+    }
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+        if(connected) {
+            loadingDisplay(false);
+        } else {
+            serverNotConnected();
+        }
+    }
+    public boolean getConnected() {
+        return connected;
+    }
+
+    public void sizeChangedDraw() {
+        draw.drawPaths(paths);
+    }
+
+    public void hardwareAddressAvailable() {
+        if(!getUsers().containsKey(getHardwareAddress()))
+            getUsers().put(getHardwareAddress(),new DrawTools());
     }
 
     public void onClickPeerDiscovered(View v) {
@@ -167,15 +247,24 @@ public class MainActivity extends Activity {
     private void setStop(boolean stop) {
         if(transmission != null)
             transmission.setStop(stop);
-        connected = false;
+        //connected = false;
     }
 
     public void loadingDisplay(boolean isLoading) {
-        if(isLoading) {
-            findViewById(R.id.loading).setVisibility(View.VISIBLE);
-        } else {
-            findViewById(R.id.loading).setVisibility(View.INVISIBLE);
-        }
+        final boolean loading = isLoading;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(loading) {
+                    drawable = false;
+                    findViewById(R.id.loading).setVisibility(View.VISIBLE);
+                } else {
+                    drawable = true;
+                    findViewById(R.id.loading).setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
     }
 
     private void initColorButtons() {
@@ -210,31 +299,105 @@ public class MainActivity extends Activity {
         }
     }
 
-    public void onCLickColorButton(View v) {
-        Button selectedColor = (Button) findViewById(R.id.selected_color);
-        String color = ((Button) v).getText().toString();
+    public void initSeekBar() {
+        SeekBar seekBar = (SeekBar) findViewById(R.id.stroke_bar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                draw.stroke = i;
+            }
 
-        selectedColor.setBackgroundColor(Color.parseColor(color));
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        seekBar = (SeekBar) findViewById(R.id.trans_bar);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                draw.alpha = i;
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        if(data.getBooleanExtra("refresh",false)) {
+            wifiP2pManager.discoverPeers(channel,receiver.discover);
+            loadingDisplay(true);
+            return;
+        }
+
         if(!data.getBooleanExtra("localMode",true)) {
             if(data.getBooleanExtra("serverMode",false)) {
-                if(transmission == null) {
-                    ServerP2P server = new ServerP2P(MainActivity.this);
-                    setTransmission(server.getSynchronizer());
-                }
+
+                ServerP2P server = new ServerP2P(MainActivity.this);
+                setTransmission(server.getSynchronizer());
+                setConnected(true);
+                //connexionMode = SERVER;
             } else {
                 receiver.connect(data.getStringExtra("deviceName"));
+                /*if(connected)
+                    connexionMode = CLIENT;*/
             }
+        } else {
+            connexionMode = LOCAL;
+            return;
         }
-        connected = true;
+/*
+        System.out.println("in ActivityResult: " + connected);
+        if(getConnected())
+            loadingDisplay(false);
+        else {
+            serverNotConnected();
+        }
+        */
     }
 
-/* Fusion DrawActivity */
+    private void serverNotConnected() {
+        loadingDisplay(true);
+        AlertDialog.Builder alert = new AlertDialog.Builder(this);
+        alert.setTitle("Connexion failed !")
+                .setMessage("Make sure the group owner is connected in Server Mode.")
+                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        wifiP2pManager.discoverPeers(channel,receiver.discover);
+                    }
+                })
+                .show();
+    }
+
+    public void startConnexionActivity() {
+        Intent intent = new Intent(mainActivity, ConnexionActivity.class);
+
+        String[] names = receiver.getPeersName().toArray(new String[receiver.getPeersName().size()]);
+        intent.putExtra("peersName", names);
+
+        mainActivity.startActivityForResult(intent, 1);
+        mainActivity.loadingDisplay(false);
+    }
 
     @Override
     public void onBackPressed() {
@@ -266,5 +429,10 @@ public class MainActivity extends Activity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
     }
 }

@@ -1,11 +1,13 @@
 package com.example.adrien.projetmobilel3.common;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import java.nio.ByteBuffer;
 import java.util.Comparator;
 
-public class HardwareAddress implements Comparable<HardwareAddress>{
+public class HardwareAddress implements Comparable<HardwareAddress>, Parcelable{
 
     public static final int BYTES = 16;
 
@@ -14,7 +16,23 @@ public class HardwareAddress implements Comparable<HardwareAddress>{
 	public HardwareAddress(byte[] address){
 		this.address = address;
 	}
-	
+
+	protected HardwareAddress(Parcel in) {
+		address = in.createByteArray();
+	}
+
+	public static final Creator<HardwareAddress> CREATOR = new Creator<HardwareAddress>() {
+		@Override
+		public HardwareAddress createFromParcel(Parcel in) {
+			return new HardwareAddress(in);
+		}
+
+		@Override
+		public HardwareAddress[] newArray(int size) {
+			return new HardwareAddress[size];
+		}
+	};
+
 	public byte[] getBytes(){
 		return address;
 	}
@@ -74,4 +92,14 @@ public class HardwareAddress implements Comparable<HardwareAddress>{
         else
             return 1;
     }
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel parcel, int i) {
+		parcel.writeByteArray(address);
+	}
 }

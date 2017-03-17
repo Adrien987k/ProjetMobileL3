@@ -58,6 +58,12 @@ public class ConnexionActivity extends Activity {
         finish();
     }
 
+    public void onClickRefresh(View v) {
+        setResult(RESULT_OK, new Intent().
+                putExtra("refresh",true));
+        finish();
+    }
+
 
     @Override
     public void onBackPressed() {

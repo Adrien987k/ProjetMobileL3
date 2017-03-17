@@ -72,6 +72,5 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
     @Override
     public void setStop(boolean stop) {
         this.stop = stop;
-        server.setStop(stop);
     }
 }

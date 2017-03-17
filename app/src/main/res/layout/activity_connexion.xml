@@ -11,10 +11,21 @@
 
 
     <ListView
+        android:id="@+id/peersList"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/peersList"
+        android:layout_above="@+id/server_mode"
+        android:layout_below="@+id/radioButton"
+        android:layout_marginTop="10dp"
         android:layout_toStartOf="@+id/radioButton" />
+
+    <ListView
+        android:id="@+id/groupInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/server_mode"
+        android:layout_marginTop="10dp"
+        android:layout_toStartOf="@+id/server_mode" />
     <Button
         android:id="@+id/local_mode"
         android:layout_width="wrap_content"
@@ -55,6 +66,24 @@
         android:checked="true"
         android:clickable="false"
         android:text="WIFI P2P" />
+
+    <TextView
+        android:id="@+id/peers_list_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/peersList"
+        android:text="@string/users_nearby"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:id="@+id/group_info_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/groupInfo"
+        android:text="@string/group_information"
+        android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+        android:layout_alignParentStart="true" />
 
 
 </RelativeLayout>

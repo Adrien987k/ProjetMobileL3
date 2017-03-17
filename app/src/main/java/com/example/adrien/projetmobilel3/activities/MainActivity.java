@@ -403,7 +403,7 @@ public class MainActivity extends Activity {
                 .show();
     }
 
-    public void startConnexionActivity(String[] peersName) {
+    public void startConnexionActivity(String[] peersName, String[] groupInformation) {
         if(!startConnexionActivity)
             return;
 
@@ -411,6 +411,7 @@ public class MainActivity extends Activity {
 
         String[] names = peersName;
         intent.putExtra("peersName", names);
+        intent.putExtra("groupInformation",groupInformation);
         intent.putExtra("isWifiP2pEnabled",isWifiP2pEnabled);
 
         mainActivity.startActivityForResult(intent, 1);

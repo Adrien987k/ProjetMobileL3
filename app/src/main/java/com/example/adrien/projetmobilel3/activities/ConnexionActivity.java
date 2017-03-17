@@ -49,7 +49,19 @@ public class ConnexionActivity extends Activity {
         as.addAll(peersName);
 
         if (peersName.length == 0) {
-            as.add("No device found");
+            as.add("No device found.");
+        }
+
+        String[] groupInfo = parameters.getStringArrayExtra("groupInformation");
+
+        lv = (ListView) findViewById(R.id.groupInfo);
+        as = new ArrayAdapter<>(this, R.layout.peer_item_adapter);
+        lv.setAdapter(as);
+
+        as.addAll(groupInfo);
+
+        if(groupInfo.length == 0) {
+            as.add("You are not part of a group.");
         }
     }
 

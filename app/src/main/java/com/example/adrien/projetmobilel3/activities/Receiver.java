@@ -8,6 +8,7 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
@@ -34,6 +35,8 @@ import java.util.List;
 
 public class Receiver extends BroadcastReceiver {
 
+    //TODO chargement infini à la première connexion
+
     private WifiP2pManager wifiP2pManager;
     private Channel channel;
     private HardwareAddress hardwareAddress;
@@ -55,10 +58,34 @@ public class Receiver extends BroadcastReceiver {
                     peersInfo.put(device.deviceName,device.deviceAddress);
                     peersName.add(device.deviceName);
                 }
-
+                /*
                 if(!mainActivity.connected
                         && mainActivity.connexionMode != MainActivity.LOCAL) {
                    mainActivity.startConnexionActivity(peersName.toArray(new String[peersName.size()]));
+                }
+                */
+
+                if(!mainActivity.connected
+                        && mainActivity.connexionMode != MainActivity.LOCAL) {
+                    wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+                        @Override
+                        public void onGroupInfoAvailable(WifiP2pGroup group) {
+
+                            if (group != null) {
+                                ArrayList<String> groupInfo = new ArrayList<>();
+                                for (WifiP2pDevice client : group.getClientList())
+                                    groupInfo.add(client.deviceName);
+
+                                mainActivity.startConnexionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
+                                        , groupInfo.toArray(new String[groupInfo.size()])
+                                );
+                            } else {
+                                mainActivity.startConnexionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
+                                        , new String[0]
+                                );
+                            }
+                        }
+                    });
                 }
             }
 
@@ -87,8 +114,8 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
 
         @Override
         public void onFailure(int reason) {
-            Toast.makeText(mainActivity, "Discover impossible. Check your WIFI connexion and refresh. ", Toast.LENGTH_SHORT).show();
-            mainActivity.startConnexionActivity(new String[0]);
+            //Toast.makeText(mainActivity, "Discover impossible. Check your WIFI connexion and refresh. ", Toast.LENGTH_SHORT).show();
+            mainActivity.startConnexionActivity(new String[0],new String[0]);
         }
     };
 
@@ -175,7 +202,8 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
     }
 
     public void connect(String deviceName){
-        if(deviceName.equals("No device found"))
+        if(deviceName.equals("No device found")
+                || deviceName.equals("You are not part of a group"))
             return;
 
             WifiP2pConfig config = new WifiP2pConfig();
@@ -185,14 +213,15 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
             wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
-                            mainActivity.loadingDisplay(true);
+                            //mainActivity.loadingDisplay(true);
                             wifiP2pManager.requestConnectionInfo(channel, connectionInfoListener);
                         }
 
                         @Override
                         public void onFailure(int reason) {
-                            Toast.makeText(mainActivity, "Connexion failed. Check your WIFI connexion and retry. Switching to local mode", Toast.LENGTH_SHORT)
+                            Toast.makeText(mainActivity, "Connexion failed.", Toast.LENGTH_SHORT)
                                     .show();
+                            wifiP2pManager.discoverPeers(channel,discover);
                         }
                     }
             );

@@ -25,5 +25,7 @@
     <string name="transparency">Transparency</string>
 
     <string name="refresh">Refresh</string>
+    <string name="users_nearby">Users nearby</string>
+    <string name="group_information">Group information</string>
 
 </resources>

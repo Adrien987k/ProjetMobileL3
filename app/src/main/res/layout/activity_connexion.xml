@@ -16,6 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/server_mode"
         android:layout_below="@+id/radioButton"
+        android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_toStartOf="@+id/radioButton" />
 
@@ -24,6 +25,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/server_mode"
+        android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_toStartOf="@+id/server_mode" />
     <Button

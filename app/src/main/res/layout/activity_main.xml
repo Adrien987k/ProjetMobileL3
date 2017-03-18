@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="false"
-            android:text="Refresh" />
+            android:text="@string/erase" />
 
         <com.example.adrien.projetmobilel3.draw.Draw
             android:id="@+id/draw"
@@ -38,9 +38,9 @@
 
     <RelativeLayout
         android:id="@+id/loading"
-        android:background="@drawable/side_nav_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@drawable/side_nav_bar"
         android:orientation="vertical">
 
         <TextView
@@ -51,9 +51,9 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="13dp"
             android:fontFamily="casual"
+            android:text="LetsDraw"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             android:textSize="36sp"
-            android:text="LetsDraw"
             tools:text="LetsDraw" />
 
         <ProgressBar
@@ -61,10 +61,10 @@
             style="?android:attr/progressBarStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="13dp"
-            android:minHeight="69dp"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true" />
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="13dp"
+            android:minHeight="69dp" />
 
     </RelativeLayout>
 

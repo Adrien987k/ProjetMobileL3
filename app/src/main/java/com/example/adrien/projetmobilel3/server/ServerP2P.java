@@ -7,7 +7,6 @@ import android.os.IBinder;
 import android.widget.Toast;
 
 import com.example.adrien.projetmobilel3.activities.MainActivity;
-import com.example.adrien.projetmobilel3.services.NetworkP2PServer;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 
 import java.io.IOException;

@@ -28,4 +28,6 @@
     <string name="users_nearby">Users nearby</string>
     <string name="group_information">Group information</string>
 
+    <string name="erase">Erase</string>
+
 </resources>

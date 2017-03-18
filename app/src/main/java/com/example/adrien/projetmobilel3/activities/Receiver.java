@@ -23,7 +23,6 @@ import com.example.adrien.projetmobilel3.R;
 import com.example.adrien.projetmobilel3.client.ClientPeer;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
-import com.example.adrien.projetmobilel3.services.NetworkP2PServer;
 
 import java.util.ArrayList;
 import java.util.HashMap;

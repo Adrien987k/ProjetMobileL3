@@ -191,7 +191,8 @@ public class Draw extends View {
         myCanvas = new Canvas(bitMap);
         myCanvas.drawColor(Color.WHITE);
         postInvalidate();
-        mainActivity.sizeChangedDraw();
+        if(mainActivity != null)
+            mainActivity.sizeChangedDraw();
     }
 
     @Override

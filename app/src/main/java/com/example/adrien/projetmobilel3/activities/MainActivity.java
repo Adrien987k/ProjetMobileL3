@@ -28,16 +28,18 @@ import com.example.adrien.projetmobilel3.R;
 import com.example.adrien.projetmobilel3.common.DrawTools;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.MyPath;
-import com.example.adrien.projetmobilel3.common.P2PServerFragment;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
 import com.example.adrien.projetmobilel3.draw.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
-import com.example.adrien.projetmobilel3.services.NetworkP2PServer;
 
 import java.util.ArrayList;
 import java.util.TreeMap;
+
+//TODO (optionnel) sauveguarde du dessin pour les nouveaux
+
+
 
 public class MainActivity extends Activity {
 
@@ -194,8 +196,10 @@ public class MainActivity extends Activity {
         this.isWifiP2pEnabled = isWifiP2pEnabled;
         if(isWifiP2pEnabled) {
            // Toast.makeText(this, "WIFI P2P enabled.", Toast.LENGTH_SHORT).show();
-        } else
-            Toast.makeText(this, "WIFI P2P disabled.", Toast.LENGTH_SHORT).show();
+        } else {
+            loadingDisplay(false);
+           Toast.makeText(this, "WIFI P2P disabled.", Toast.LENGTH_SHORT).show();
+        }
 
     }
 

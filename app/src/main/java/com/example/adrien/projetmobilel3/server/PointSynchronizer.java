@@ -6,7 +6,7 @@ import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
-import com.example.adrien.projetmobilel3.draw.Point;
+import com.example.adrien.projetmobilel3.common.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;

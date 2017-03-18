@@ -30,7 +30,7 @@ import com.example.adrien.projetmobilel3.common.MyPath;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
-import com.example.adrien.projetmobilel3.draw.Point;
+import com.example.adrien.projetmobilel3.common.Point;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
 
 import java.util.ArrayList;

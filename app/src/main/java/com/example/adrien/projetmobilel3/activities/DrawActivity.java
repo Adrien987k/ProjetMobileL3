@@ -406,11 +406,11 @@ public class DrawActivity extends Activity {
                 .show();
     }
 
-    public void startConnexionActivity(String[] peersName, String[] groupInformation) {
+    public void startConnectionActivity(String[] peersName, String[] groupInformation) {
         if(!startConnexionActivity)
             return;
 
-        Intent intent = new Intent(drawActivity, ConnexionActivity.class);
+        Intent intent = new Intent(drawActivity, ConnectionActivity.class);
 
         String[] names = peersName;
         intent.putExtra("peersName", names);

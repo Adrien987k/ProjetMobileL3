@@ -57,7 +57,7 @@ public class Receiver extends BroadcastReceiver {
                 /*
                 if(!drawActivity.connected
                         && drawActivity.connexionMode != DrawActivity.LOCAL) {
-                   drawActivity.startConnexionActivity(peersName.toArray(new String[peersName.size()]));
+                   drawActivity.startConnectionActivity(peersName.toArray(new String[peersName.size()]));
                 }
                 */
 
@@ -72,11 +72,11 @@ public class Receiver extends BroadcastReceiver {
                                 for (WifiP2pDevice client : group.getClientList())
                                     groupInfo.add(client.deviceName);
 
-                                drawActivity.startConnexionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
+                                drawActivity.startConnectionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
                                         , groupInfo.toArray(new String[groupInfo.size()])
                                 );
                             } else {
-                                drawActivity.startConnexionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
+                                drawActivity.startConnectionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
                                         , new String[0]
                                 );
                             }
@@ -111,7 +111,7 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
         @Override
         public void onFailure(int reason) {
             //Toast.makeText(drawActivity, "Discover impossible. Check your WIFI connexion and refresh. ", Toast.LENGTH_SHORT).show();
-            drawActivity.startConnexionActivity(new String[0],new String[0]);
+            drawActivity.startConnectionActivity(new String[0],new String[0]);
         }
     };
 

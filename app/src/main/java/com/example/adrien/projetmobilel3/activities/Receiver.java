@@ -17,6 +17,7 @@ import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 //import android.util.Log;
 import android.widget.Toast;
 
+import com.example.adrien.projetmobilel3.R;
 import com.example.adrien.projetmobilel3.client.ClientPeer;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
@@ -29,18 +30,50 @@ import java.util.List;
  * Created by Adrien on 20/02/2017.
  */
 
+
+/**
+ * The Receiver class manage WIFI P2P connection.
+ * It contains some listener to handle discovery result
+ * or to connect to another P2P device.
+ */
 public class Receiver extends BroadcastReceiver {
 
     //TODO chargement infini à la première connexion
 
+    /**
+     * Provide an interface to interact with other P2P devices.
+     */
     private WifiP2pManager wifiP2pManager;
+
+    /**
+     * WIFI P2P Channel.
+     */
     private Channel channel;
+
+    /**
+     * The hardware address of the device.
+     */
     private HardwareAddress hardwareAddress;
+
+    /**
+     * The link to the draw activity.
+     */
     private DrawActivity drawActivity;
 
+    /**
+     * The list of others P2P devices.
+     */
     private List<WifiP2pDevice> peers = new ArrayList<>();
+
+    /**
+     * The hash map between name of others P2P devices and their address.
+     */
     private HashMap<String,String> peersInfo = new HashMap<>();
 
+    /**
+     * Listener used when the peers list has changed.
+     * If the user is not yet connected, it will start the connection activity.
+     */
     private PeerListListener peerListListener = new PeerListListener() {
         @Override
         public void onPeersAvailable(WifiP2pDeviceList newPeers) {
@@ -54,15 +87,9 @@ public class Receiver extends BroadcastReceiver {
                     peersInfo.put(device.deviceName,device.deviceAddress);
                     peersName.add(device.deviceName);
                 }
-                /*
-                if(!drawActivity.connected
-                        && drawActivity.connexionMode != DrawActivity.LOCAL) {
-                   drawActivity.startConnectionActivity(peersName.toArray(new String[peersName.size()]));
-                }
-                */
 
                 if(!drawActivity.connected
-                        && drawActivity.connexionMode != DrawActivity.LOCAL) {
+                        && drawActivity.connectionMode != DrawActivity.LOCAL) {
                     wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
                         @Override
                         public void onGroupInfoAvailable(WifiP2pGroup group) {
@@ -88,7 +115,13 @@ public class Receiver extends BroadcastReceiver {
         }
     };
 
-final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener() {
+    /**
+     * Listener used when a discovery is started.
+     * If the discovery failed, it will start the connection activity immediately.
+     * If not, the activity will start when the peer list will be updated.
+     * A discovery is started every 20 seconds if the connection activity is not aleady started.
+     */
+    public final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener() {
         @Override
         public void onSuccess() {
             new Thread(new Runnable() {
@@ -115,22 +148,29 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
         }
     };
 
-    private ConnectionInfoListener connectionInfoListener = new ConnectionInfoListener() {
+    /**
+     * Listener used when the connection to a peer is successful.
+     * Note that it's the P2P connection and not the server connection.
+     * If the user is the group owner, a server will be created.
+     * If he'is a member, he will try to connect to the server.
+     * An error message is sent if the connection to the server failed.
+     */
+    private final ConnectionInfoListener connectionInfoListener = new ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
             wifiP2pManager.stopPeerDiscovery(channel,null);
             if(info.groupFormed) {
                 if(info.isGroupOwner){
-                    Toast.makeText(drawActivity, "You are the group owner", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(drawActivity, R.string.you_are_group_owner, Toast.LENGTH_SHORT).show();
                     ServerP2P server = new ServerP2P(drawActivity);
                     drawActivity.setTransmission(server.getSynchronizer());
                     drawActivity.setConnected(true);
-                    drawActivity.connexionMode = DrawActivity.SERVER;
+                    drawActivity.connectionMode = DrawActivity.SERVER;
                     // Do whatever tasks are specific to the group owner.
                     // One common case is creating a group owner thread and accepting
                     // incoming connections.
                 } else {
-                    Toast.makeText(drawActivity, "You are a group member", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(drawActivity, R.string.you_are_group_member, Toast.LENGTH_SHORT).show();
                     if(drawActivity.getTransmission() != null)
                         drawActivity.getTransmission().setStop(true);
                     if(hardwareAddress != null) {
@@ -138,11 +178,10 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
                         if(client.connexionEstablished()) {
                             drawActivity.setTransmission(client);
                             drawActivity.setConnected(true);
-                            drawActivity.connexionMode = DrawActivity.CLIENT;
+                            drawActivity.connectionMode = DrawActivity.CLIENT;
                         } else  {
                             drawActivity.setConnected(false);
                         }
-                        System.out.println("in Receiver: " + drawActivity.getConnected());
                     }
                     else {
                         throw new IllegalStateException("Hardware address unknown");
@@ -155,6 +194,9 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
         }
     };
 
+    /**
+     * Create a receiver with the specified manager, channel and activity.
+     */
     public Receiver(WifiP2pManager wifiP2pManager, Channel channel, DrawActivity activity){
         this.wifiP2pManager = wifiP2pManager;
         this.channel = channel;
@@ -197,9 +239,15 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
         }
     }
 
+    /**
+     * Try to connect with the specified P2P device.
+     * If the connection fails, an error messgae is sent and a new discovery is started.
+     * @param deviceName The device to connect to.
+     */
     public void connect(String deviceName){
         if(deviceName.equals("No device found")
-                || deviceName.equals("You are not part of a group"))
+                || deviceName.equals("You are not part of a group")
+                || !drawActivity.isWifiP2pEnabled())
             return;
 
             WifiP2pConfig config = new WifiP2pConfig();
@@ -215,7 +263,7 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
 
                         @Override
                         public void onFailure(int reason) {
-                            Toast.makeText(drawActivity, "Connexion failed.", Toast.LENGTH_SHORT)
+                            Toast.makeText(drawActivity, R.string.connection_failed, Toast.LENGTH_SHORT)
                                     .show();
                             wifiP2pManager.discoverPeers(channel,discover);
                         }
@@ -223,6 +271,10 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
             );
     }
 
+    /**
+     * Set the hardware address and notify the draw activity.
+     * @param hardwareAddress The new hardware address.
+     */
     private void setHardwareAddress(HardwareAddress hardwareAddress) {
         this.hardwareAddress = hardwareAddress;
         drawActivity.hardwareAddressAvailable();

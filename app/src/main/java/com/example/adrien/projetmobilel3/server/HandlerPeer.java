@@ -18,30 +18,63 @@ import java.net.SocketException;
 import java.util.ArrayList;
 
 /**
- * Created by MrkJudge on 24/02/2017.
+ * The HandlerPeer class is created when a client try to connect to the server.
+ * The handler will wait for a init message from the client to register them
+ * into the server.
  */
 
-//TODO non terminé
 public class HandlerPeer extends Thread {
 
     private ServerP2P server;
     private Socket socket;
+
+    /**
+     * The output stream of the socket
+     */
     private OutputStream os;
 
+    /**
+     * Indicate if the handler must stop.
+     */
     private boolean stop = false;
 
+    /**
+     * Draw tools of the client.
+     * Check DrawTools documentation for more.
+     */
+    private DrawTools drawTools;
+
+    /**
+     * The path where the user draw.
+     */
     private Path localPath = new Path();
+
+    /**
+     * The paint used to draw the path.
+     */
     private Paint localPaint = new Paint();
 
+
+    /**
+     * An array list where each point received from the client is stored.
+     * Note that this list is frequently gathered and reset.
+     */
     private final ArrayList<PointPacket> pointPackets = new ArrayList<>();
 
-
+    /**
+     * Create a new handler bound to the specified server using the specified socket.
+     * @param server The server bound to.
+     * @param socket The socket to use.
+     */
     public HandlerPeer(ServerP2P server,Socket socket) {
         this.server = server;
         this.socket = socket;
         init();
     }
 
+    /**
+     * Initialize the paint of the client.
+     */
     private void init() {
         localPaint.setAntiAlias(true);
         localPaint.setStyle(Paint.Style.STROKE);
@@ -52,14 +85,15 @@ public class HandlerPeer extends Thread {
     public DrawActivity getMainActivity() {
         return server.getDrawActivity();
     }
-    public DrawTools getDrawTools() {
-        return new DrawTools(localPath, localPaint);
-    }
     public ArrayList<PointPacket> getPointPackets() {
         return pointPackets;
     }
 
-    //TODO en fonction de celle du synchronize
+    /**
+     * This method is called by the synchronizer to get points from the points list.
+     * The list is immediately reset.
+     * @return The array list containing client's points
+     */
     public synchronized ArrayList<PointPacket> gatherPoints() {
         ArrayList<PointPacket> knownPointPackets = new ArrayList<>(pointPackets);
         pointPackets.clear();
@@ -95,13 +129,20 @@ public class HandlerPeer extends Thread {
 
     }
 
+    /**
+     * Register the client in the server with his hardware address.
+     * @param message The init message containing the hardware address.
+     */
     public void initMessage(Message message) {
         server.getHandlers().put(message.getHardwareAddress(),this);
         System.out.println("Handler registered");
-        //System.out.println(message.getHardwareAddress());
 
     }
 
+    /**
+     * Send an array list of point packets to the client
+     * @param pointPackets The array list of points packets to send.
+     */
     public synchronized void sendPointPackets(ArrayList<PointPacket> pointPackets) {
         try {
             for(PointPacket pointPacket: pointPackets)
@@ -114,6 +155,11 @@ public class HandlerPeer extends Thread {
         }
     }
 
+    /**
+     * Called after reading a point packet.
+     * This will draw the point on the server draw and add it to the point list.
+     * @param pointPacket The point packet received.
+     */
     private void handleData(PointPacket pointPacket) {
 
         pointPackets.add(pointPacket);
@@ -137,6 +183,12 @@ public class HandlerPeer extends Thread {
         }
     }
 
+    /**
+     * A personal implementation of the method Path.lineTo.
+     * This method must be used instead of Path.lineTo if you have multiple users.
+     * It will prevent you to have superposition conflicts,
+     * because only the new point, and therefore the line to the last point, is drawn.
+     */
     private synchronized void myLineTo(float x, float y) {
         localPath.lineTo(x, y);
         getMainActivity().getDraw().getMyCanvas().drawPath(localPath, localPaint);
@@ -145,6 +197,10 @@ public class HandlerPeer extends Thread {
         localPath.moveTo(x,y);
     }
 
+    /**
+     * Set the handler state.
+     * @param stop True if the handler must stop.
+     */
     public void setStop(boolean stop) {
         this.stop = stop;
     }

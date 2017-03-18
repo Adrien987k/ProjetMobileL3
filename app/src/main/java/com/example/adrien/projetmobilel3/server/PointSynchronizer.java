@@ -12,24 +12,52 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
- * Created by MrkJudge on 25/02/2017.
+ * The PointSynchronize class will gather points from each user
+ * and send them to each others.
+ * The server will add directly his point to the synchronizer while
+ * the synchronizer will gather points from handlers.
  */
 
-//TODO non terminé
 public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,HandlerPeer>,ArrayList<Point>,Boolean> implements PointTransmission{
 
+    /**
+     * The frequency at which the synchronizer will gather and send points.
+     */
     public static final int REFRESH_RATE = 100;
 
+    /**
+     * All points from every users.
+     */
     private final ArrayList<PointPacket> pointPackets = new ArrayList<>();
+
+    /**
+     * The hash map containing handlers by their client's hardware address.
+     */
     private HashMap<HardwareAddress,HandlerPeer> handlers;
 
+    /**
+     * The server.
+     */
     private ServerP2P server;
+
+    /**
+     * Indicate if the synchronizer must stop.
+     */
     private boolean stop = false;
 
+    /**
+     * Create a synchronizer boud to the specified server.
+     * @param server
+     */
     public PointSynchronizer(ServerP2P server) {
         this.server = server;
     }
 
+
+    /**
+     * Link to the draw of the server user.
+     * @return
+     */
     public Draw getDraw() {
         return server.getDrawActivity().getDraw();
     }
@@ -57,17 +85,27 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
         return true;
     }
 
+    /**
+     * Gather all points from each handler.
+     */
     private synchronized void gatherPoints(){
         for(HandlerPeer handler: handlers.values()) {
             pointPackets.addAll(handler.gatherPoints());
         }
     }
 
+    /**
+     * @param pointPacket The point packet to send.
+     */
     @Override
     public synchronized void addPointPacket(PointPacket pointPacket) {
         pointPackets.add(pointPacket);
     }
 
+    /**
+     * Set the synchronizer state.
+     * @param stop True if the synchronizer must stop.
+     */
     @Override
     public void setStop(boolean stop) {
         this.stop = stop;

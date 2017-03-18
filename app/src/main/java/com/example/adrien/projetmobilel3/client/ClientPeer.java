@@ -21,24 +21,61 @@ import java.net.SocketException;
 import java.util.TreeMap;
 
 /**
- * Created by MrkJudge on 08/03/2017.
+ * The ClientPeer class is used to connect to a server.
+ * This client sends and receives data.
+ * At initialization, the client send a message with
+ * the hardware address ot the device, then wait
+ * for data to write or read.
  */
 
 public class ClientPeer extends Thread implements PointTransmission {
 
+    /**
+     * The socket to write and read data.
+     */
     private Socket socket;
+
+    /**
+     * The output stream from the socket.
+     */
     private OutputStream os;
 
+    /**
+     * The link to the draw activity.
+     */
     private DrawActivity drawActivity;
+
+    /**
+     * The hardware address of the device.
+     */
     private HardwareAddress hardwareAddress;
+
+    /**
+     * The IP address of the server.
+     */
     private InetAddress serverAddress;
 
+    /**
+     * Indicate if the client must stop.
+     */
     private boolean stop = false;
+
+    /**
+     * Indicate if the connection to the server is established.
+     */
     private boolean connexionEstablished = false;
 
-
-    //TODO not working
+    /**
+     * Indicate if the client has already attempted to connect to the server.
+     */
     private boolean connexionAttempt = false;
+
+    /**
+     * Create a client with the specified draw activity, server address and device hardware address.
+     * @param drawActivity The link to the draw activity.
+     * @param serverAddress The IP address of the server.
+     * @param hardwareAddress The hardware address of the device.
+     */
     public ClientPeer(DrawActivity drawActivity, InetAddress serverAddress, HardwareAddress hardwareAddress) {
         this.drawActivity = drawActivity;
         this.serverAddress = serverAddress;
@@ -88,6 +125,11 @@ public class ClientPeer extends Thread implements PointTransmission {
     }
 
 
+    /**
+     * Handle a point packet received from the server.
+     * The point is identified by the hardware address of the drawer.
+     * @param pointPacket
+     */
     private synchronized void handleData(PointPacket pointPacket) {
         HardwareAddress hardwareAddressReceived = pointPacket.getHardwareAddress();
         getDrawActivity().getDraw().getPoints().add(pointPacket);
@@ -100,40 +142,7 @@ public class ClientPeer extends Thread implements PointTransmission {
             }
         }
     }
-/*
-    private synchronized void drawPointPacket(DrawTools drawTools, PointPacket pointPacket) {
-        float x = pointPacket.getPoint().getX();
-        float y = pointPacket.getPoint().getY();
-        Path path = drawTools.getPath();
-        Paint paint = drawTools.getPaint();
 
-        switch (pointPacket.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                paint.setStrokeWidth(pointPacket.getPoint().getStroke());
-                paint.setColor(pointPacket.getPoint().getColor());
-                path.moveTo(x, y);
-                break;
-            case MotionEvent.ACTION_MOVE:
-                myLineTo(x, y, drawTools);
-                break;
-            case MotionEvent.ACTION_UP:
-                myLineTo(x, y, drawTools);
-                path.reset();
-                break;
-        }
-    }
-
-    private synchronized void myLineTo(float x, float y, DrawTools drawTools) {
-        Path path = drawTools.getPath();
-        Paint paint = drawTools.getPaint();
-
-        path.lineTo(x, y);
-        getDraw().getMyCanvas().drawPath(path, paint);
-        getDraw().postInvalidate();
-        path.reset();
-        path.moveTo(x,y);
-    }
-*/
     private DrawActivity getDrawActivity() {
         return drawActivity;
     }
@@ -147,12 +156,20 @@ public class ClientPeer extends Thread implements PointTransmission {
         return getDrawActivity().getUsers();
     }
 
+    /**
+     * Set the client state.
+     * @param stop True if the client must stop.
+     */
     @Override
     public void setStop(boolean stop) {
         this.stop = stop;
         connexionEstablished = false;
     }
 
+    /**
+     * Send a point packet to the server.
+     * @param pointPacket The point packet to send.
+     */
     @Override
     public synchronized void addPointPacket(PointPacket pointPacket) {
         try {
@@ -169,6 +186,11 @@ public class ClientPeer extends Thread implements PointTransmission {
         }
     }
 
+    /**
+     * Indicate if the connection is established.
+     * This method will block until an effective attempt is done.
+     * @return True if the connection to the server is established.
+     */
     public boolean connexionEstablished() {
         while (!connexionAttempt) {}
         return connexionEstablished;

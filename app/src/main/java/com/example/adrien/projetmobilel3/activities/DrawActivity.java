@@ -39,30 +39,112 @@ import java.util.TreeMap;
 //TODO (optionnel) sauveguarde du dessin pour les nouveaux
 
 
-
+/**
+ * The DrawActivity class is the main activity of the application.
+ * This activity is launched at the starting of the application
+ * and will display a loading screen waiting for network information.
+ * When network information are available, it will starts ConnectionActivity
+ * to select the connection mode. (Note that it's not always the case, check
+ * the ConnectionActivity documentation for more).
+ * When the ConnectionActivity returns a correct result, the user can draw.
+ */
 public class DrawActivity extends Activity {
 
+    /**
+     * Means that the user is in local mode.
+     */
     public static final int LOCAL = 1;
+
+    /**
+     * Means that the user is in server mode.
+     */
     public static final int SERVER = 2;
+
+    /**
+     * Means that the user is in client mode.
+     */
     public static final int CLIENT = 3;
+
+    /**
+     * Means that the user has not selected a mode.
+     */
     public static final int NONE = 0;
 
+    /**
+     * Initialized at creation, it will catch relevant intent for the activity.
+     */
     private final IntentFilter intentFilter = new IntentFilter();
+
+    /**
+     * Initialized at creation, it provides an interface to interact with
+     * other devices with WIFI P2P.
+     */
     private WifiP2pManager wifiP2pManager = null;
+
+    /**
+     * WIFI P2P Channel
+     */
     private Channel channel = null;
+
+    /**
+     * WIFI P2P Receiver.
+     * Check Receiver documentation for more.
+     */
     private Receiver receiver = null;
+
+    /**
+     * The point transmission.
+     * Check PointTransmission documentation for more.
+     */
     private PointTransmission transmission;
 
-    public int connexionMode = NONE;
-    private boolean isWifiP2pEnabled = false;
-    public final DrawActivity drawActivity = this;
-    public boolean connected = false;
-    private boolean drawable = false;
-    private boolean startConnexionActivity = true;
+    /**
+     * The current connection mode.
+     */
+    public int connectionMode = NONE;
 
+    /**
+     * Indicate if the WIFI P2P is enabled.
+     */
+    private boolean isWifiP2pEnabled = false;
+
+    /**
+     * A link to this activity, to ease link transmission.
+     */
+    public final DrawActivity drawActivity = this;
+
+    /**
+     * Indicate if the user is properly connected, in local or network mode.
+     */
+    public boolean connected = false;
+
+    /**
+     * Indicate if the user can draw.
+     * Usually it's false when the loading screen is displayed.
+     */
+    private boolean drawable = false;
+
+    /**
+     * Indicate if the connection activity can be started.
+     * Usually it's false when an error message is not confirmed by the user.
+     */
+    private boolean startConnectionActivity = true;
+
+    /**
+     * The link to the draw view.
+     */
     private Draw draw;
 
+    /**
+     * A list of paths containing all known points.
+     * These points are savec when the activity need to restart.
+     */
     private ArrayList<MyPath> paths = new ArrayList<>();
+
+    /**
+     * A tree map to attribute draw tools to each user.
+     * This is required when you have multiple users.
+     */
     private final TreeMap<HardwareAddress,DrawTools> users = new TreeMap<>();
 
     @Override
@@ -104,7 +186,7 @@ public class DrawActivity extends Activity {
             draw.color = savedInstanceState.getInt("color");
             draw.stroke = savedInstanceState.getInt("stroke");
             draw.alpha = savedInstanceState.getInt("alpha");
-            connexionMode = savedInstanceState.getInt("connexionMode");
+            connectionMode = savedInstanceState.getInt("connectionMode");
             ArrayList<HardwareAddress> usersHardwareAddress = savedInstanceState.getParcelableArrayList("usersHardwareAddress");
             for (HardwareAddress address : usersHardwareAddress) {
                 users.put(address, new DrawTools());
@@ -130,9 +212,7 @@ public class DrawActivity extends Activity {
         wifiP2pManager.discoverPeers(channel,receiver.discover);
     }
 
-    //TODO sauvegarde des données
-    //sauvegarde du serveur
-    //sauvegarde des points
+    //TODO sauvegarde des données améliorée
     @Override
     public void onResume(){
         super.onResume();
@@ -140,7 +220,7 @@ public class DrawActivity extends Activity {
         receiver = new Receiver(wifiP2pManager, channel, this);
         registerReceiver(receiver, intentFilter);
 
-        if(connexionMode == LOCAL) {
+        if(connectionMode == LOCAL) {
             loadingDisplay(false);
             return;
         }
@@ -184,13 +264,18 @@ public class DrawActivity extends Activity {
         outState.putInt("color",draw.color);
         outState.putInt("stroke",draw.stroke);
         outState.putInt("alpha",draw.alpha);
-        outState.putInt("connexionMode",connexionMode);
+        outState.putInt("connectionMode", connectionMode);
         //outState.putParcelableArrayList("paths",paths);
         ArrayList<HardwareAddress> hardwareAddresses = new ArrayList<>(getUsers().keySet());
         outState.putParcelableArrayList("usersHardwareAddress",hardwareAddresses);
         outState.putParcelableArrayList("points",getPoints());
     }
 
+    /**
+     * Set the WIFI P2P state.
+     * If it's false, the user is notified with a message.
+     * @param isWifiP2pEnabled True if the WIFI P2P is enabled.
+     */
     public void setIsWifiP2pEnabled(boolean isWifiP2pEnabled){
         this.isWifiP2pEnabled = isWifiP2pEnabled;
         if(isWifiP2pEnabled) {
@@ -202,6 +287,19 @@ public class DrawActivity extends Activity {
 
     }
 
+    /**
+     * Indicates if the WIFI P2P is enabled.
+     * @return True if the wifi P2P is enabled.
+     */
+    public boolean isWifiP2pEnabled() {
+        return isWifiP2pEnabled;
+    }
+
+    /**
+     * Set the new transmission.
+     * Can be null, if it's the case, new points will only be local.
+     * @param transmission The new transmission.
+     */
     public void setTransmission(PointTransmission transmission) {
         this.transmission = transmission;
     }
@@ -230,6 +328,13 @@ public class DrawActivity extends Activity {
     public ArrayList<PointPacket> getPoints() {
         return getDraw().getPoints();
     }
+
+    /**
+     * Set the connection state.
+     * If true, the loading screen is turned off and the user can draw.
+     * Else, the connection to the server failed and an error message is sent.
+     * @param connected True if the connection to the server is successful.
+     */
     public void setConnected(boolean connected) {
         this.connected = connected;
         if(connected) {
@@ -242,25 +347,45 @@ public class DrawActivity extends Activity {
         return connected;
     }
 
+    /**
+     * When the screen changes, usually when it rotates,
+     * this method is called by the draw view to re-draw old points.
+     */
     public void sizeChangedDraw() {
         draw.drawPaths(paths);
     }
 
+    /**
+     * This method is called when the hardware address of the device is available,
+     * and set it.
+     */
     public void hardwareAddressAvailable() {
         if(!getUsers().containsKey(getHardwareAddress()))
             getUsers().put(getHardwareAddress(),new DrawTools());
     }
 
+    /**
+     * Called when the user click on a device name and connect to it.
+     */
     public void onClickPeerDiscovered(View v) {
         receiver.connect(((TextView) v).getText().toString());
     }
 
+    /**
+     * Stop the transmission if exists.
+     * @param stop True to stop the transmission.
+     */
     private void setStop(boolean stop) {
         if(transmission != null)
             transmission.setStop(stop);
         //connected = false;
     }
 
+    /**
+     * Enable or disable the loading screen.
+     * While the loading screen is enabled, the user can't draw.
+     * @param isLoading True to enable the loading screen.
+     */
     public void loadingDisplay(boolean isLoading) {
         final boolean loading = isLoading;
         runOnUiThread(new Runnable() {
@@ -278,6 +403,9 @@ public class DrawActivity extends Activity {
 
     }
 
+    /**
+     * Initialize listener of all buttons of color selection.
+     */
     private void initColorButtons() {
         ArrayList<Button> colorButtons = new ArrayList<>();
 
@@ -310,6 +438,10 @@ public class DrawActivity extends Activity {
         }
     }
 
+    /**
+     * Initialize listener of all seek bar.
+     *
+     */
     public void initSeekBar() {
         SeekBar seekBar = (SeekBar) findViewById(R.id.stroke_bar);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -350,6 +482,9 @@ public class DrawActivity extends Activity {
 
     }
 
+    /**
+     * Called when the ConnectionActivity returns and handle the result.
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -366,15 +501,15 @@ public class DrawActivity extends Activity {
                 ServerP2P server = new ServerP2P(DrawActivity.this);
                 setTransmission(server.getSynchronizer());
                 setConnected(true);
-                //connexionMode = SERVER;
+                //connectionMode = SERVER;
             } else {
-                startConnexionActivity = false;
+                startConnectionActivity = false;
                 receiver.connect(data.getStringExtra("deviceName"));
                 /*if(connected)
-                    connexionMode = CLIENT;*/
+                    connectionMode = CLIENT;*/
             }
         } else {
-            connexionMode = LOCAL;
+            connectionMode = LOCAL;
             setConnected(true);
             return;
         }
@@ -390,24 +525,37 @@ public class DrawActivity extends Activity {
         */
     }
 
+    /**
+     * Called when the connection to the server has failed.
+     * The loading screen is enabled and an alert is sent.
+     * The user must click on OK to restart a discovery and the connection activity.
+     */
     private void serverNotConnected() {
         loadingDisplay(true);
-        startConnexionActivity = false;
+        startConnectionActivity = false;
         AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("Connexion failed !")
-                .setMessage("Make sure the group owner is connected in Server Mode.")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        alert.setTitle(R.string.connection_failed)
+                .setMessage(R.string.group_owner_server_mode)
+                .setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        startConnexionActivity = true;
+                        startConnectionActivity = true;
                         wifiP2pManager.discoverPeers(channel,receiver.discover);
                     }
                 })
                 .show();
     }
 
+    /**
+     * Start the connection activity with given parameters.
+     * Check if the activity can be started and return if not.
+     * @param peersName The string array containing all found devices.
+     *                  Size can be 0.
+     * @param groupInformation The string array containing information about the group.
+     *                  Size can be 0.
+     */
     public void startConnectionActivity(String[] peersName, String[] groupInformation) {
-        if(!startConnexionActivity)
+        if(!startConnectionActivity)
             return;
 
         Intent intent = new Intent(drawActivity, ConnectionActivity.class);
@@ -421,6 +569,10 @@ public class DrawActivity extends Activity {
         drawActivity.loadingDisplay(false);
     }
 
+    /**
+     * Close the draw settings view if activated.
+     * Else call super.onBackPressed.
+     */
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_draw);

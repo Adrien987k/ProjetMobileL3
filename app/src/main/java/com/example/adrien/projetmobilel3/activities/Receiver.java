@@ -158,7 +158,7 @@ public class Receiver extends BroadcastReceiver {
     private final ConnectionInfoListener connectionInfoListener = new ConnectionInfoListener() {
         @Override
         public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-            wifiP2pManager.stopPeerDiscovery(channel,null);
+            //wifiP2pManager.stopPeerDiscovery(channel,null);
             if(info.groupFormed) {
                 if(info.isGroupOwner){
                     Toast.makeText(drawActivity, R.string.you_are_group_owner, Toast.LENGTH_SHORT).show();
@@ -231,7 +231,9 @@ public class Receiver extends BroadcastReceiver {
             }
 
         } else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
-            //wifiP2pManager.requestConnectionInfo(channel,connectionInfoListener);
+
+            if(drawActivity.getAutomaticReconnection())
+                wifiP2pManager.requestConnectionInfo(channel,connectionInfoListener);
 
         } else if(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)){
             WifiP2pDevice device = intent.getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);

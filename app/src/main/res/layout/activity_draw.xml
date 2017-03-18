@@ -16,6 +16,7 @@
         android:layout_marginTop="0dp"
         android:background="@color/lightgrey">
 
+
         <Button
             android:id="@+id/refresh_button"
             android:layout_width="wrap_content"
@@ -23,6 +24,15 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentTop="false"
             android:text="@string/erase" />
+
+        <ImageButton
+            android:id="@+id/button_connection_mode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_toStartOf="@id/refresh_button"
+            android:src="@drawable/connection_mode"
+            android:onClick="onClickConnectionMode"/>
 
         <com.example.adrien.projetmobilel3.draw.Draw
             android:id="@+id/draw"
@@ -41,7 +51,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/side_nav_bar"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="invisible">
 
         <TextView
             android:id="@+id/app_name"

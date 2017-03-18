@@ -130,6 +130,8 @@ public class DrawActivity extends Activity {
      */
     private boolean startConnectionActivity = true;
 
+    private boolean automaticReconnection = false;
+
     /**
      * The link to the draw view.
      */
@@ -328,6 +330,12 @@ public class DrawActivity extends Activity {
     public ArrayList<PointPacket> getPoints() {
         return getDraw().getPoints();
     }
+    public void setAutomaticReconnection(boolean automaticReconnection) {
+        this.automaticReconnection = automaticReconnection;
+    }
+    public boolean getAutomaticReconnection() {
+        return automaticReconnection;
+    }
 
     /**
      * Set the connection state.
@@ -369,6 +377,13 @@ public class DrawActivity extends Activity {
      */
     public void onClickPeerDiscovered(View v) {
         receiver.connect(((TextView) v).getText().toString());
+    }
+
+    public void onClickConnectionMode(View v) {
+        startConnectionActivity = true;
+        connected = false;
+        loadingDisplay(true);
+        wifiP2pManager.discoverPeers(channel,receiver.discover);
     }
 
     /**
@@ -558,6 +573,7 @@ public class DrawActivity extends Activity {
         if(!startConnectionActivity)
             return;
 
+        automaticReconnection = true;
         Intent intent = new Intent(drawActivity, ConnectionActivity.class);
 
         String[] names = peersName;

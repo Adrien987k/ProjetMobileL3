@@ -10,7 +10,7 @@ import java.net.SocketTimeoutException;
 import java.util.HashMap;
 
 /**
- * Created by MrkJudge on 24/02/2017.
+ * The ServerP2P class is a server where other P2P users can connect to.
  */
 
 public class ServerP2P extends Thread {

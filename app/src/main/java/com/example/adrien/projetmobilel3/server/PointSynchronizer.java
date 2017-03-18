@@ -3,10 +3,10 @@ package com.example.adrien.projetmobilel3.server;
 import android.os.AsyncTask;
 
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
+import com.example.adrien.projetmobilel3.common.Point;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
 import com.example.adrien.projetmobilel3.draw.Draw;
-import com.example.adrien.projetmobilel3.common.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,7 +56,6 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
 
     /**
      * Link to the draw of the server user.
-     * @return
      */
     public Draw getDraw() {
         return server.getDrawActivity().getDraw();
@@ -71,8 +70,10 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
             try {
                 Thread.sleep(REFRESH_RATE);
                 gatherPoints();
-                    HashMap<HardwareAddress,HandlerPeer> knownHandlers = new HashMap<>(handlers);
-                    ArrayList<PointPacket> knownPointPackets = new ArrayList<>(pointPackets);
+                HashMap<HardwareAddress,HandlerPeer> knownHandlers = new HashMap<>(handlers);
+                ArrayList<PointPacket> knownPointPackets = new ArrayList<>(pointPackets);
+                for(PointPacket pointPacket: knownPointPackets) {
+                }
                     pointPackets.clear();
                     for (HandlerPeer handler : knownHandlers.values()) {
                         handler.sendPointPackets(knownPointPackets);

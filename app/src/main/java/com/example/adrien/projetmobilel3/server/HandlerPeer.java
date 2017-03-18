@@ -145,8 +145,9 @@ public class HandlerPeer extends Thread {
      */
     public synchronized void sendPointPackets(ArrayList<PointPacket> pointPackets) {
         try {
-            for(PointPacket pointPacket: pointPackets)
+            for(PointPacket pointPacket: pointPackets) {
                 os.write(pointPacket.getBytes());
+            }
         } catch (SocketException e) {
             e.printStackTrace();
             setStop(true);

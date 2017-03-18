@@ -26,6 +26,8 @@ import java.util.ArrayList;
 public class ConnectionActivity extends Activity {
 
     private boolean isWifiP2pEnabled;
+    private boolean peerFound = true;
+    private boolean groupFormed = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,7 @@ public class ConnectionActivity extends Activity {
 
         if (peersName.length == 0) {
             as.add("No device found.");
+            peerFound = false;
         }
 
         String[] groupInfo = parameters.getStringArrayExtra("groupInformation");
@@ -80,7 +83,9 @@ public class ConnectionActivity extends Activity {
     public void onClickPeerDiscovered(View v) {
         if(((TextView) v).getText().toString().equals(R.string.no_device_found)
                 || ((TextView) v).getText().toString().equals(R.string.no_group)
-                || !isWifiP2pEnabled)
+                || !isWifiP2pEnabled
+                || !peerFound
+                || !groupFormed)
             return;
         setResult(RESULT_OK,new Intent()
                 .putExtra("deviceName",((TextView) v).getText().toString())

@@ -15,11 +15,8 @@ import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 //import android.util.Log;
-import android.view.View;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.example.adrien.projetmobilel3.R;
 import com.example.adrien.projetmobilel3.client.ClientPeer;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.server.ServerP2P;
@@ -39,7 +36,7 @@ public class Receiver extends BroadcastReceiver {
     private WifiP2pManager wifiP2pManager;
     private Channel channel;
     private HardwareAddress hardwareAddress;
-    private MainActivity mainActivity;
+    private DrawActivity drawActivity;
 
     private List<WifiP2pDevice> peers = new ArrayList<>();
     private HashMap<String,String> peersInfo = new HashMap<>();
@@ -58,14 +55,14 @@ public class Receiver extends BroadcastReceiver {
                     peersName.add(device.deviceName);
                 }
                 /*
-                if(!mainActivity.connected
-                        && mainActivity.connexionMode != MainActivity.LOCAL) {
-                   mainActivity.startConnexionActivity(peersName.toArray(new String[peersName.size()]));
+                if(!drawActivity.connected
+                        && drawActivity.connexionMode != DrawActivity.LOCAL) {
+                   drawActivity.startConnexionActivity(peersName.toArray(new String[peersName.size()]));
                 }
                 */
 
-                if(!mainActivity.connected
-                        && mainActivity.connexionMode != MainActivity.LOCAL) {
+                if(!drawActivity.connected
+                        && drawActivity.connexionMode != DrawActivity.LOCAL) {
                     wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
                         @Override
                         public void onGroupInfoAvailable(WifiP2pGroup group) {
@@ -75,11 +72,11 @@ public class Receiver extends BroadcastReceiver {
                                 for (WifiP2pDevice client : group.getClientList())
                                     groupInfo.add(client.deviceName);
 
-                                mainActivity.startConnexionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
+                                drawActivity.startConnexionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
                                         , groupInfo.toArray(new String[groupInfo.size()])
                                 );
                             } else {
-                                mainActivity.startConnexionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
+                                drawActivity.startConnexionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
                                         , new String[0]
                                 );
                             }
@@ -103,7 +100,7 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
                         e.printStackTrace();
                     }
                     if(peers.size() == 0
-                               && !mainActivity.connected) {
+                               && !drawActivity.connected) {
                             wifiP2pManager.discoverPeers(channel,discover);
                        }
 
@@ -113,8 +110,8 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
 
         @Override
         public void onFailure(int reason) {
-            //Toast.makeText(mainActivity, "Discover impossible. Check your WIFI connexion and refresh. ", Toast.LENGTH_SHORT).show();
-            mainActivity.startConnexionActivity(new String[0],new String[0]);
+            //Toast.makeText(drawActivity, "Discover impossible. Check your WIFI connexion and refresh. ", Toast.LENGTH_SHORT).show();
+            drawActivity.startConnexionActivity(new String[0],new String[0]);
         }
     };
 
@@ -124,28 +121,28 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
             wifiP2pManager.stopPeerDiscovery(channel,null);
             if(info.groupFormed) {
                 if(info.isGroupOwner){
-                    Toast.makeText(mainActivity, "You are the group owner", Toast.LENGTH_SHORT).show();
-                    ServerP2P server = new ServerP2P(mainActivity);
-                    mainActivity.setTransmission(server.getSynchronizer());
-                    mainActivity.setConnected(true);
-                    mainActivity.connexionMode = MainActivity.SERVER;
+                    Toast.makeText(drawActivity, "You are the group owner", Toast.LENGTH_SHORT).show();
+                    ServerP2P server = new ServerP2P(drawActivity);
+                    drawActivity.setTransmission(server.getSynchronizer());
+                    drawActivity.setConnected(true);
+                    drawActivity.connexionMode = DrawActivity.SERVER;
                     // Do whatever tasks are specific to the group owner.
                     // One common case is creating a group owner thread and accepting
                     // incoming connections.
                 } else {
-                    Toast.makeText(mainActivity, "You are a group member", Toast.LENGTH_SHORT).show();
-                    if(mainActivity.getTransmission() != null)
-                        mainActivity.getTransmission().setStop(true);
+                    Toast.makeText(drawActivity, "You are a group member", Toast.LENGTH_SHORT).show();
+                    if(drawActivity.getTransmission() != null)
+                        drawActivity.getTransmission().setStop(true);
                     if(hardwareAddress != null) {
-                        ClientPeer client = new ClientPeer(mainActivity, info.groupOwnerAddress, hardwareAddress);
+                        ClientPeer client = new ClientPeer(drawActivity, info.groupOwnerAddress, hardwareAddress);
                         if(client.connexionEstablished()) {
-                            mainActivity.setTransmission(client);
-                            mainActivity.setConnected(true);
-                            mainActivity.connexionMode = MainActivity.CLIENT;
+                            drawActivity.setTransmission(client);
+                            drawActivity.setConnected(true);
+                            drawActivity.connexionMode = DrawActivity.CLIENT;
                         } else  {
-                            mainActivity.setConnected(false);
+                            drawActivity.setConnected(false);
                         }
-                        System.out.println("in Receiver: " + mainActivity.getConnected());
+                        System.out.println("in Receiver: " + drawActivity.getConnected());
                     }
                     else {
                         throw new IllegalStateException("Hardware address unknown");
@@ -158,10 +155,10 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
         }
     };
 
-    public Receiver(WifiP2pManager wifiP2pManager, Channel channel, MainActivity activity){
+    public Receiver(WifiP2pManager wifiP2pManager, Channel channel, DrawActivity activity){
         this.wifiP2pManager = wifiP2pManager;
         this.channel = channel;
-        this.mainActivity = activity;
+        this.drawActivity = activity;
     }
 
     public HardwareAddress getHardwareAddress() {
@@ -174,9 +171,9 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
         if(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)){
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
             if(state == WifiP2pManager.WIFI_P2P_STATE_ENABLED){
-                mainActivity.setIsWifiP2pEnabled(true);
+                drawActivity.setIsWifiP2pEnabled(true);
             } else {
-                mainActivity.setIsWifiP2pEnabled(false);
+                drawActivity.setIsWifiP2pEnabled(false);
             }
         } else if(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)){
                 wifiP2pManager.requestPeers(channel, peerListListener);
@@ -212,13 +209,13 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
             wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {
-                            //mainActivity.loadingDisplay(true);
+                            //drawActivity.loadingDisplay(true);
                             wifiP2pManager.requestConnectionInfo(channel, connectionInfoListener);
                         }
 
                         @Override
                         public void onFailure(int reason) {
-                            Toast.makeText(mainActivity, "Connexion failed.", Toast.LENGTH_SHORT)
+                            Toast.makeText(drawActivity, "Connexion failed.", Toast.LENGTH_SHORT)
                                     .show();
                             wifiP2pManager.discoverPeers(channel,discover);
                         }
@@ -228,7 +225,7 @@ final WifiP2pManager.ActionListener discover = new WifiP2pManager.ActionListener
 
     private void setHardwareAddress(HardwareAddress hardwareAddress) {
         this.hardwareAddress = hardwareAddress;
-        mainActivity.hardwareAddressAvailable();
+        drawActivity.hardwareAddressAvailable();
     }
     public ArrayList<String> getPeersName() {
         return new ArrayList<>(peersInfo.keySet());

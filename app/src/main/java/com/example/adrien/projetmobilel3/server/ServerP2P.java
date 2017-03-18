@@ -1,12 +1,6 @@
 package com.example.adrien.projetmobilel3.server;
 
-import android.content.ComponentName;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import android.widget.Toast;
-
-import com.example.adrien.projetmobilel3.activities.MainActivity;
+import com.example.adrien.projetmobilel3.activities.DrawActivity;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 
 import java.io.IOException;
@@ -30,19 +24,19 @@ public class ServerP2P extends Thread {
     private boolean stop = false;
     private int port;
 
-    private MainActivity mainActivity;
+    private DrawActivity drawActivity;
 
-    public ServerP2P(MainActivity mainActivity, int port) {
+    public ServerP2P(DrawActivity drawActivity, int port) {
         this.port = port;
-        this.mainActivity = mainActivity;
+        this.drawActivity = drawActivity;
         this.synchronizer = new PointSynchronizer(this);
 
         synchronizer.execute(handlers);
         start();
     }
 
-    public ServerP2P(MainActivity mainActivity) {
-        this(mainActivity,DEFAULT_PORT);
+    public ServerP2P(DrawActivity drawActivity) {
+        this(drawActivity,DEFAULT_PORT);
     }
 
     @Override
@@ -67,8 +61,8 @@ public class ServerP2P extends Thread {
         return handlers;
     }
 
-    public MainActivity getMainActivity() {
-        return mainActivity;
+    public DrawActivity getDrawActivity() {
+        return drawActivity;
     }
 
     public PointSynchronizer getSynchronizer() {

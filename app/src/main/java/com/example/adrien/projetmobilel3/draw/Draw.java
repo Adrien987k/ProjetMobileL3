@@ -7,19 +7,16 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Parcel;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.example.adrien.projetmobilel3.activities.MainActivity;
+import com.example.adrien.projetmobilel3.activities.DrawActivity;
 import com.example.adrien.projetmobilel3.common.DrawTools;
-import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.MyPath;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
 
 /**
  * Created by MrkJudge on 24/01/2017.
@@ -42,7 +39,7 @@ public class Draw extends View {
     private Bitmap bitMap;
     private MyPath myPath;
 
-    private MainActivity mainActivity;
+    private DrawActivity drawActivity;
 
     private ArrayList<PointPacket> points = new ArrayList<>();
 
@@ -191,8 +188,8 @@ public class Draw extends View {
         myCanvas = new Canvas(bitMap);
         myCanvas.drawColor(Color.WHITE);
         postInvalidate();
-        if(mainActivity != null)
-            mainActivity.sizeChangedDraw();
+        if(drawActivity != null)
+            drawActivity.sizeChangedDraw();
     }
 
     @Override
@@ -204,13 +201,13 @@ public class Draw extends View {
 
     }
 
-    public void setMainActivity(MainActivity mainActivity) {
-        this.mainActivity = mainActivity;
+    public void setDrawActivity(DrawActivity drawActivity) {
+        this.drawActivity = drawActivity;
     }
 
     public synchronized void clear() {
 
-        mainActivity.getPaths().clear();
+        drawActivity.getPaths().clear();
         myCanvas.drawColor(Color.WHITE);
     }
 
@@ -220,11 +217,11 @@ public class Draw extends View {
     public void setPoints(ArrayList<PointPacket> points) {
         this.points = points;
         for(PointPacket pointPacket: points)
-            drawPointPacket(getMainActivity().getUsers().get(pointPacket.getHardwareAddress()),pointPacket);
+            drawPointPacket(getDrawActivity().getUsers().get(pointPacket.getHardwareAddress()),pointPacket);
     }
 
-    public MainActivity getMainActivity() {
-        return mainActivity;
+    public DrawActivity getDrawActivity() {
+        return drawActivity;
     }
 
 }

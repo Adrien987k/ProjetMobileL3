@@ -1,13 +1,9 @@
 package com.example.adrien.projetmobilel3.client;
 
 import android.content.Context;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.net.ConnectivityManager;
-import android.view.MotionEvent;
 
-import com.example.adrien.projetmobilel3.activities.MainActivity;
-import com.example.adrien.projetmobilel3.activities.Receiver;
+import com.example.adrien.projetmobilel3.activities.DrawActivity;
 import com.example.adrien.projetmobilel3.common.DrawTools;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.Message;
@@ -33,7 +29,7 @@ public class ClientPeer extends Thread implements PointTransmission {
     private Socket socket;
     private OutputStream os;
 
-    private MainActivity mainActivity;
+    private DrawActivity drawActivity;
     private HardwareAddress hardwareAddress;
     private InetAddress serverAddress;
 
@@ -43,8 +39,8 @@ public class ClientPeer extends Thread implements PointTransmission {
 
     //TODO not working
     private boolean connexionAttempt = false;
-    public ClientPeer(MainActivity mainActivity, InetAddress serverAddress, HardwareAddress hardwareAddress) {
-        this.mainActivity = mainActivity;
+    public ClientPeer(DrawActivity drawActivity, InetAddress serverAddress, HardwareAddress hardwareAddress) {
+        this.drawActivity = drawActivity;
         this.serverAddress = serverAddress;
         this.hardwareAddress = hardwareAddress;
         start();
@@ -53,7 +49,7 @@ public class ClientPeer extends Thread implements PointTransmission {
     @Override
     public void run() {
         super.run();
-        ConnectivityManager cm = (ConnectivityManager) (mainActivity.getSystemService(Context.CONNECTIVITY_SERVICE));
+        ConnectivityManager cm = (ConnectivityManager) (drawActivity.getSystemService(Context.CONNECTIVITY_SERVICE));
         if(cm != null
                 && cm.getActiveNetworkInfo().isConnected())  {
 
@@ -94,7 +90,7 @@ public class ClientPeer extends Thread implements PointTransmission {
 
     private synchronized void handleData(PointPacket pointPacket) {
         HardwareAddress hardwareAddressReceived = pointPacket.getHardwareAddress();
-        getMainActivity().getDraw().getPoints().add(pointPacket);
+        getDrawActivity().getDraw().getPoints().add(pointPacket);
         if(!hardwareAddressReceived.equals(hardwareAddress)) {
             if (getUsers().containsKey(hardwareAddressReceived)) {
                 getDraw().drawPointPacket(getUsers().get(hardwareAddressReceived), pointPacket);
@@ -138,17 +134,17 @@ public class ClientPeer extends Thread implements PointTransmission {
         path.moveTo(x,y);
     }
 */
-    private MainActivity getMainActivity() {
-        return mainActivity;
+    private DrawActivity getDrawActivity() {
+        return drawActivity;
     }
     private Draw getDraw() {
-        return getMainActivity().getDraw();
+        return getDrawActivity().getDraw();
     }
     private HardwareAddress getHardwareAddress() {
-        return getMainActivity().getHardwareAddress();
+        return getDrawActivity().getHardwareAddress();
     }
     private TreeMap<HardwareAddress,DrawTools> getUsers() {
-        return getMainActivity().getUsers();
+        return getDrawActivity().getUsers();
     }
 
     @Override

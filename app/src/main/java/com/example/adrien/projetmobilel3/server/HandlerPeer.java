@@ -4,7 +4,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.view.MotionEvent;
 
-import com.example.adrien.projetmobilel3.activities.MainActivity;
+import com.example.adrien.projetmobilel3.activities.DrawActivity;
 import com.example.adrien.projetmobilel3.common.DrawTools;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.Message;
@@ -49,8 +49,8 @@ public class HandlerPeer extends Thread {
         localPaint.setStrokeCap(Paint.Cap.ROUND);
     }
 
-    public MainActivity getMainActivity() {
-        return server.getMainActivity();
+    public DrawActivity getMainActivity() {
+        return server.getDrawActivity();
     }
     public DrawTools getDrawTools() {
         return new DrawTools(localPath, localPaint);

@@ -2,7 +2,6 @@ package com.example.adrien.projetmobilel3.server;
 
 import android.os.AsyncTask;
 
-import com.example.adrien.projetmobilel3.common.DrawTools;
 import com.example.adrien.projetmobilel3.common.HardwareAddress;
 import com.example.adrien.projetmobilel3.common.PointPacket;
 import com.example.adrien.projetmobilel3.common.PointTransmission;
@@ -32,7 +31,7 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
     }
 
     public Draw getDraw() {
-        return server.getMainActivity().getDraw();
+        return server.getDrawActivity().getDraw();
     }
 
     @Override

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.graphics.Color;
-import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.os.Bundle;
@@ -41,7 +40,7 @@ import java.util.TreeMap;
 
 
 
-public class MainActivity extends Activity {
+public class DrawActivity extends Activity {
 
     public static final int LOCAL = 1;
     public static final int SERVER = 2;
@@ -56,7 +55,7 @@ public class MainActivity extends Activity {
 
     public int connexionMode = NONE;
     private boolean isWifiP2pEnabled = false;
-    public final MainActivity mainActivity = this;
+    public final DrawActivity drawActivity = this;
     public boolean connected = false;
     private boolean drawable = false;
     private boolean startConnexionActivity = true;
@@ -69,11 +68,11 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_draw);
 
         loadingDisplay(true);
 
-        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_main);
+        final DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_draw);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, null, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
@@ -85,7 +84,7 @@ public class MainActivity extends Activity {
         intentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
 
         draw = (Draw) findViewById(R.id.draw);
-        draw.setMainActivity(this);
+        draw.setDrawActivity(this);
         draw.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -118,7 +117,7 @@ public class MainActivity extends Activity {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MainActivity.this.getDraw().clear();
+                DrawActivity.this.getDraw().clear();
             }
         });
 
@@ -151,13 +150,13 @@ public class MainActivity extends Activity {
             public void onConnectionInfoAvailable(WifiP2pInfo info) {
                 if(info.groupFormed) {
                     if(info.isGroupOwner) {
-                        ServerP2P server = new ServerP2P(MainActivity.this);
+                        ServerP2P server = new ServerP2P(DrawActivity.this);
                         setTransmission(server.getSynchronizer());
                         connected = true;
                         loadingDisplay(false);
                     } else {
                          if(getHardwareAddress() != null) {
-                             //transmission = new ClientPeer(MainActivity.this, info.groupOwnerAddress,getHardwareAddress());
+                             //transmission = new ClientPeer(DrawActivity.this, info.groupOwnerAddress,getHardwareAddress());
                          }
                     }
                 }
@@ -364,7 +363,7 @@ public class MainActivity extends Activity {
         if(!data.getBooleanExtra("localMode",true)) {
             if(data.getBooleanExtra("serverMode",false)) {
 
-                ServerP2P server = new ServerP2P(MainActivity.this);
+                ServerP2P server = new ServerP2P(DrawActivity.this);
                 setTransmission(server.getSynchronizer());
                 setConnected(true);
                 //connexionMode = SERVER;
@@ -379,7 +378,7 @@ public class MainActivity extends Activity {
             setConnected(true);
             return;
         }
-        System.out.println("in MainActivity: " + mainActivity.getConnected());
+        System.out.println("in DrawActivity: " + drawActivity.getConnected());
 
 /*
         System.out.println("in ActivityResult: " + connected);
@@ -411,20 +410,20 @@ public class MainActivity extends Activity {
         if(!startConnexionActivity)
             return;
 
-        Intent intent = new Intent(mainActivity, ConnexionActivity.class);
+        Intent intent = new Intent(drawActivity, ConnexionActivity.class);
 
         String[] names = peersName;
         intent.putExtra("peersName", names);
         intent.putExtra("groupInformation",groupInformation);
         intent.putExtra("isWifiP2pEnabled",isWifiP2pEnabled);
 
-        mainActivity.startActivityForResult(intent, 1);
-        mainActivity.loadingDisplay(false);
+        drawActivity.startActivityForResult(intent, 1);
+        drawActivity.loadingDisplay(false);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_main);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.activity_draw);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {

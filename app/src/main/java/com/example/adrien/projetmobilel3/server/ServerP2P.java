@@ -69,6 +69,7 @@ public class ServerP2P extends Thread {
     @Override
     public void run() {
         try (ServerSocket ss = new ServerSocket(port)){
+            drawActivity.setTransmission(synchronizer);
             System.out.println("Server Created");
             ss.setSoTimeout(1000);
             while(!stop) {

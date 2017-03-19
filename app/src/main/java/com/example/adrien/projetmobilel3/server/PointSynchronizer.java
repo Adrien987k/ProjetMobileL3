@@ -63,19 +63,16 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
 
     @Override
     protected Boolean doInBackground(HashMap<HardwareAddress,HandlerPeer>... params) {
-        //TODO non terminé
         this.handlers = params[0];
 
         while(!stop) {
             try {
                 Thread.sleep(REFRESH_RATE);
                 gatherPoints();
-                HashMap<HardwareAddress,HandlerPeer> knownHandlers = new HashMap<>(handlers);
-                ArrayList<PointPacket> knownPointPackets = new ArrayList<>(pointPackets);
-                for(PointPacket pointPacket: knownPointPackets) {
-                }
-                    pointPackets.clear();
-                    for (HandlerPeer handler : knownHandlers.values()) {
+                    HashMap<HardwareAddress,HandlerPeer> knownHandlers = new HashMap<>(handlers);
+                ArrayList<PointPacket> knownPointPackets = new ArrayList<>(getPointPackets());
+                getPointPackets().clear();
+                for (HandlerPeer handler : knownHandlers.values()) {
                         handler.sendPointPackets(knownPointPackets);
                     }
             } catch (InterruptedException e) {
@@ -91,7 +88,7 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
      */
     private synchronized void gatherPoints(){
         for(HandlerPeer handler: handlers.values()) {
-            pointPackets.addAll(handler.gatherPoints());
+            getPointPackets().addAll(handler.gatherPoints());
         }
     }
 
@@ -100,7 +97,11 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
      */
     @Override
     public synchronized void addPointPacket(PointPacket pointPacket) {
-        pointPackets.add(pointPacket);
+        getPointPackets().add(pointPacket);
+    }
+
+    private ArrayList<PointPacket> getPointPackets() {
+        return pointPackets;
     }
 
     /**

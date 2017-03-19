@@ -87,29 +87,28 @@ public class Receiver extends BroadcastReceiver {
                     peersInfo.put(device.deviceName,device.deviceAddress);
                     peersName.add(device.deviceName);
                 }
+            }
+            if(!drawActivity.connected
+                    && drawActivity.connectionMode != DrawActivity.LOCAL) {
+                wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+                    @Override
+                    public void onGroupInfoAvailable(WifiP2pGroup group) {
 
-                if(!drawActivity.connected
-                        && drawActivity.connectionMode != DrawActivity.LOCAL) {
-                    wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
-                        @Override
-                        public void onGroupInfoAvailable(WifiP2pGroup group) {
+                        if (group != null) {
+                            ArrayList<String> groupInfo = new ArrayList<>();
+                            for (WifiP2pDevice client : group.getClientList())
+                                groupInfo.add(client.deviceName);
 
-                            if (group != null) {
-                                ArrayList<String> groupInfo = new ArrayList<>();
-                                for (WifiP2pDevice client : group.getClientList())
-                                    groupInfo.add(client.deviceName);
-
-                                drawActivity.startConnectionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
-                                        , groupInfo.toArray(new String[groupInfo.size()])
-                                );
-                            } else {
-                                drawActivity.startConnectionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
-                                        , new String[0]
-                                );
-                            }
+                            drawActivity.startConnectionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
+                                    , groupInfo.toArray(new String[groupInfo.size()])
+                            );
+                        } else {
+                            drawActivity.startConnectionActivity(peersInfo.keySet().toArray(new String[peersInfo.keySet().size()])
+                                    , new String[0]
+                            );
                         }
-                    });
-                }
+                    }
+                });
             }
 
         }
@@ -134,7 +133,7 @@ public class Receiver extends BroadcastReceiver {
                     }
                     if(peers.size() == 0
                                && !drawActivity.connected) {
-                            wifiP2pManager.discoverPeers(channel,discover);
+                            drawActivity.startConnectionActivity(new String[0],new String[0]);
                        }
 
                 }
@@ -163,7 +162,6 @@ public class Receiver extends BroadcastReceiver {
                 if(info.isGroupOwner){
                     Toast.makeText(drawActivity, R.string.you_are_group_owner, Toast.LENGTH_SHORT).show();
                     ServerP2P server = new ServerP2P(drawActivity);
-                    drawActivity.setTransmission(server.getSynchronizer());
                     drawActivity.setConnected(true);
                     drawActivity.connectionMode = DrawActivity.SERVER;
                     // Do whatever tasks are specific to the group owner.
@@ -247,15 +245,15 @@ public class Receiver extends BroadcastReceiver {
      * @param deviceName The device to connect to.
      */
     public void connect(String deviceName){
-        if(deviceName.equals("No device found")
-                || deviceName.equals("You are not part of a group")
-                || !drawActivity.isWifiP2pEnabled())
+        if(!drawActivity.isWifiP2pEnabled()
+                || peersInfo.get(deviceName) == null) {
+            Toast.makeText(drawActivity, "Couldn't initiate connection", Toast.LENGTH_SHORT).show();
             return;
+        }
 
             WifiP2pConfig config = new WifiP2pConfig();
             config.deviceAddress = peersInfo.get(deviceName);
             config.wps.setup = WpsInfo.PBC;
-
             wifiP2pManager.connect(channel, config, new WifiP2pManager.ActionListener() {
                         @Override
                         public void onSuccess() {

@@ -233,7 +233,6 @@ public class DrawActivity extends Activity {
                 if(info.groupFormed) {
                     if(info.isGroupOwner) {
                         ServerP2P server = new ServerP2P(DrawActivity.this);
-                        setTransmission(server.getSynchronizer());
                         connected = true;
                         loadingDisplay(false);
                     } else {
@@ -267,9 +266,8 @@ public class DrawActivity extends Activity {
         outState.putInt("stroke",draw.stroke);
         outState.putInt("alpha",draw.alpha);
         outState.putInt("connectionMode", connectionMode);
-        //outState.putParcelableArrayList("paths",paths);
-        ArrayList<HardwareAddress> hardwareAddresses = new ArrayList<>(getUsers().keySet());
-        outState.putParcelableArrayList("usersHardwareAddress",hardwareAddresses);
+        //ArrayList<HardwareAddress> hardwareAddresses = new ArrayList<>(getUsers().keySet());
+        //outState.putParcelableArrayList("usersHardwareAddress",hardwareAddresses);
         outState.putParcelableArrayList("points",getPoints());
     }
 
@@ -503,7 +501,7 @@ public class DrawActivity extends Activity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        startConnectionActivity = true;
         if(data.getBooleanExtra("refresh",false)) {
             wifiP2pManager.discoverPeers(channel,receiver.discover);
             loadingDisplay(true);
@@ -514,7 +512,6 @@ public class DrawActivity extends Activity {
             if(data.getBooleanExtra("serverMode",false)) {
 
                 ServerP2P server = new ServerP2P(DrawActivity.this);
-                setTransmission(server.getSynchronizer());
                 setConnected(true);
                 //connectionMode = SERVER;
             } else {
@@ -526,9 +523,11 @@ public class DrawActivity extends Activity {
         } else {
             connectionMode = LOCAL;
             setConnected(true);
+            setAutomaticReconnection(false);
             return;
         }
         System.out.println("in DrawActivity: " + drawActivity.getConnected());
+
 
 /*
         System.out.println("in ActivityResult: " + connected);
@@ -574,6 +573,7 @@ public class DrawActivity extends Activity {
             return;
 
         automaticReconnection = true;
+        startConnectionActivity = false;
         Intent intent = new Intent(drawActivity, ConnectionActivity.class);
 
         String[] names = peersName;

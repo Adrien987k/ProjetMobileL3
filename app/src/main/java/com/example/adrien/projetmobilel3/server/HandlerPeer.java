@@ -27,6 +27,7 @@ public class HandlerPeer extends Thread {
 
     private ServerP2P server;
     private Socket socket;
+    private HardwareAddress hardwareAddress;
 
     /**
      * The output stream of the socket
@@ -122,8 +123,8 @@ public class HandlerPeer extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            server.getHandlers().remove(this);
-            System.out.println("Handler unregistered");
+            server.getHandlers().remove(hardwareAddress);
+            System.out.println("Handler unregistered. nb: " + server.getHandlers().size());
             System.out.println("Handler Closed");
         }
 
@@ -134,9 +135,9 @@ public class HandlerPeer extends Thread {
      * @param message The init message containing the hardware address.
      */
     public void initMessage(Message message) {
-        server.getHandlers().put(message.getHardwareAddress(),this);
-        System.out.println("Handler registered");
-
+        hardwareAddress = message.getHardwareAddress();
+        server.getHandlers().put(hardwareAddress,this);
+        System.out.println("Handler registered. nb: " + server.getHandlers().size());
     }
 
     /**

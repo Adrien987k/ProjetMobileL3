@@ -36,7 +36,11 @@
     <string name="you_are_group_owner">You are the group owner</string>
     <string name="you_are_group_member">You are the group member</string>
 
+    <string name="wifip2pdisabled">WIFI P2P disabled</string>
     <string name="connection_failed">Connection failed</string>
     <string name="group_owner_server_mode">Make sure the group owner is connected in Server Mode</string>
     <string name="ok">OK</string>
+
+    <string name="server_mode">Server mode</string>
+    <string name="local_mode">Local mode</string>
 </resources>

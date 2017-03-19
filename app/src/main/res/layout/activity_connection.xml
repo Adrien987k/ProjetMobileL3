@@ -28,25 +28,26 @@
         android:layout_marginRight="10dp"
         android:layout_marginTop="10dp"
         android:layout_toStartOf="@+id/server_mode" />
+
     <Button
         android:id="@+id/local_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Local Mode"
-        android:onClick="onClickLocalMode"
-        android:layout_marginTop="37dp"
         android:layout_below="@+id/discover_button"
-        android:layout_toEndOf="@+id/peersList" />
+        android:layout_marginTop="37dp"
+        android:layout_toEndOf="@+id/peersList"
+        android:onClick="onClickLocalMode"
+        android:text="@string/local_mode" />
 
     <Button
         android:id="@+id/server_mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Server Mode"
-        android:onClick="onClickServerMode"
         android:layout_below="@+id/local_mode"
+        android:layout_marginTop="36dp"
         android:layout_toEndOf="@+id/peersList"
-        android:layout_marginTop="36dp" />
+        android:onClick="onClickServerMode"
+        android:text="@string/server_mode" />
 
     <Button
         android:id="@+id/discover_button"

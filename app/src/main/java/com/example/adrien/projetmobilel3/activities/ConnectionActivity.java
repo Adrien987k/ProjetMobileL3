@@ -59,7 +59,7 @@ public class ConnectionActivity extends Activity {
         as.addAll(peersName);
 
         if (peersName.length == 0) {
-            as.add("No device found.");
+            as.add(getString(R.string.no_device_found));
             peerFound = false;
         }
 
@@ -72,7 +72,7 @@ public class ConnectionActivity extends Activity {
         as.addAll(groupInfo);
 
         if(groupInfo.length == 0) {
-            as.add("You are not part of a group.");
+            as.add(getString(R.string.no_group));
         }
     }
 

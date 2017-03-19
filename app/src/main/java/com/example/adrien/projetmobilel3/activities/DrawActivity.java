@@ -282,7 +282,7 @@ public class DrawActivity extends Activity {
            // Toast.makeText(this, "WIFI P2P enabled.", Toast.LENGTH_SHORT).show();
         } else {
             loadingDisplay(false);
-           Toast.makeText(this, "WIFI P2P disabled.", Toast.LENGTH_SHORT).show();
+           Toast.makeText(this, R.string.wifip2pdisabled, Toast.LENGTH_SHORT).show();
         }
 
     }

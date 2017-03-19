@@ -1,0 +1,46 @@
+<resources>
+    <string name="app_name">LetsDraw</string>
+    <string name="title_activity_draw">DrawActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+
+    <string name="red">#FF0000</string>
+    <string name="green">#00FF00</string>
+    <string name="blue">#0000FF</string>
+    <string name="yellow">#FFFF00</string>
+    <string name="cyan">#00FFFF</string>
+    <string name="pink">#FF00FF</string>
+    <string name="brown">#663300</string>
+    <string name="violet">#990099</string>
+    <string name="orange">#FF6600</string>
+    <string name="black">#000000</string>
+    <string name="white">#FFFFFF</string>
+    <string name="grey">#808080</string>
+
+    <string name="stroke">Trait</string>
+    <string name="thickness">Epaisseur</string>
+    <string name="transparency">Transparence</string>
+
+    <string name="refresh">Rafraichir</string>
+    <string name="users_nearby">Utilisateurs proches</string>
+    <string name="group_information">Information du groupe</string>
+
+    <string name="erase">Effacer</string>
+
+    <string name="no_device_found">Pas d\'appareil trouvé.</string>
+    <string name="no_group">Vous ne faites pas parti d\'un groupe</string>
+
+    <string name="wifip2pdisabled">WIFI P2P désactivée</string>
+    <string name="you_are_group_owner">Vous êtes le chef de groupe</string>
+    <string name="you_are_group_member">Vous êtes un membre du groupe</string>
+
+    <string name="connection_failed">Connection échouée</string>
+    <string name="group_owner_server_mode">Soyez sûr que le chef de groupe est en mode serveur</string>
+    <string name="ok">OK</string>
+
+    <string name="server_mode">Mode serveur</string>
+    <string name="local_mode">Mode local</string>
+</resources>

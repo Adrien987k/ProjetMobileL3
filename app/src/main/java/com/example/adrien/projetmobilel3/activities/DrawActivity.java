@@ -36,8 +36,6 @@ import com.example.adrien.projetmobilel3.server.ServerP2P;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
-//TODO (optionnel) sauveguarde du dessin pour les nouveaux
-
 
 /**
  * The DrawActivity class is the main activity of the application.
@@ -130,6 +128,9 @@ public class DrawActivity extends Activity {
      */
     private boolean startConnectionActivity = true;
 
+    /**
+     * Indicate if the connection to the group is automatically done.
+     */
     private boolean automaticReconnection = false;
 
     /**
@@ -214,7 +215,6 @@ public class DrawActivity extends Activity {
         wifiP2pManager.discoverPeers(channel,receiver.discover);
     }
 
-    //TODO sauvegarde des données améliorée
     @Override
     public void onResume(){
         super.onResume();
@@ -377,6 +377,9 @@ public class DrawActivity extends Activity {
         receiver.connect(((TextView) v).getText().toString());
     }
 
+    /**
+     * Start a new discovery a launch the connection activity.
+     */
     public void onClickConnectionMode(View v) {
         startConnectionActivity = true;
         connected = false;

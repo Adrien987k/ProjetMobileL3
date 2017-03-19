@@ -100,7 +100,6 @@ public class Draw extends View {
     /**
      * An array list containing every points drawn.
      * It's used to save points when the activity need to restart.
-     * //TODO unused ?
      */
     private ArrayList<PointPacket> points = new ArrayList<>();
 

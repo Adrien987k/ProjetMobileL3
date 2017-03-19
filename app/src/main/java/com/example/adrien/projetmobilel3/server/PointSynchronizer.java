@@ -27,9 +27,14 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
     public static final int REFRESH_RATE = 100;
 
     /**
-     * All points from every users.
+     * All new points from every users.
      */
     private final ArrayList<PointPacket> pointPackets = new ArrayList<>();
+
+    /**
+     * All points drawn from the beginning.
+     * They are sent after the init message for any new user.
+     */
     private final ArrayList<PointPacket> pointPacketsFromStart = new ArrayList<>();
 
     /**
@@ -54,7 +59,6 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
     public PointSynchronizer(ServerP2P server) {
         this.server = server;
     }
-
 
     /**
      * Link to the draw of the server user.
@@ -107,6 +111,11 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
     public ArrayList<PointPacket> getPointPackets() {
         return pointPackets;
     }
+
+    /**
+     * Return all points drawn from the beginning.
+     * @return The array list of all points.
+     */
     public ArrayList<PointPacket> getPointPacketsFromStart() {
         return pointPacketsFromStart;
     }

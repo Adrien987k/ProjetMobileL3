@@ -14,7 +14,6 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
-//import android.util.Log;
 import android.widget.Toast;
 
 import com.example.adrien.projetmobilel3.R;
@@ -27,18 +26,11 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by Adrien on 20/02/2017.
- */
-
-
-/**
  * The Receiver class manage WIFI P2P connection.
  * It contains some listener to handle discovery result
  * or to connect to another P2P device.
  */
 public class Receiver extends BroadcastReceiver {
-
-    //TODO chargement infini à la première connexion
 
     /**
      * Provide an interface to interact with other P2P devices.
@@ -91,6 +83,7 @@ public class Receiver extends BroadcastReceiver {
             if(!drawActivity.connected
                     && drawActivity.connectionMode != DrawActivity.LOCAL) {
                 wifiP2pManager.requestGroupInfo(channel, new WifiP2pManager.GroupInfoListener() {
+
                     @Override
                     public void onGroupInfoAvailable(WifiP2pGroup group) {
 
@@ -209,24 +202,21 @@ public class Receiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
         if(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)){
+
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_WIFI_STATE, -1);
             if(state == WifiP2pManager.WIFI_P2P_STATE_ENABLED){
                 drawActivity.setIsWifiP2pEnabled(true);
             } else {
                 drawActivity.setIsWifiP2pEnabled(false);
             }
+
         } else if(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)){
                 wifiP2pManager.requestPeers(channel, peerListListener);
 
-            NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
-
+            NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
             if(networkInfo != null
-                &&networkInfo.isConnected()) {
-                //Connected to an other device
-                //info to find group owner IP
-
+                &&networkInfo.isConnected())
                 wifiP2pManager.requestConnectionInfo(channel, connectionInfoListener);
-            }
 
         } else if(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)){
 

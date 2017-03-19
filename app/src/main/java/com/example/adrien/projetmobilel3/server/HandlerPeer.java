@@ -138,6 +138,7 @@ public class HandlerPeer extends Thread {
         hardwareAddress = message.getHardwareAddress();
         server.getHandlers().put(hardwareAddress,this);
         System.out.println("Handler registered. nb: " + server.getHandlers().size());
+        sendPointPackets(server.getSynchronizer().getPointPacketsFromStart());
     }
 
     /**

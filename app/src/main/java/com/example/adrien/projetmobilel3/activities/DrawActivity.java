@@ -201,7 +201,7 @@ public class DrawActivity extends Activity {
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DrawActivity.this.getDraw().clear();
+                getDraw().clear();
             }
         });
 

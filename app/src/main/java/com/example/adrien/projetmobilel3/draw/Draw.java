@@ -331,8 +331,7 @@ public class Draw extends View {
      * Clear all known points and clear the drawable area.
      */
     public synchronized void clear() {
-
-        drawActivity.getPaths().clear();
+        //drawActivity.getPaths().clear();
         myCanvas.drawColor(Color.WHITE);
     }
 

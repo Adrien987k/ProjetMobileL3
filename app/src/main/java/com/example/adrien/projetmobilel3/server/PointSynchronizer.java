@@ -10,6 +10,7 @@ import com.example.adrien.projetmobilel3.draw.Draw;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.TreeMap;
 
 /**
  * The PointSynchronize class will gather points from each user
@@ -29,6 +30,7 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
      * All points from every users.
      */
     private final ArrayList<PointPacket> pointPackets = new ArrayList<>();
+    private final ArrayList<PointPacket> pointPacketsFromStart = new ArrayList<>();
 
     /**
      * The hash map containing handlers by their client's hardware address.
@@ -89,6 +91,7 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
     private synchronized void gatherPoints(){
         for(HandlerPeer handler: handlers.values()) {
             getPointPackets().addAll(handler.gatherPoints());
+            pointPacketsFromStart.addAll(pointPackets);
         }
     }
 
@@ -98,10 +101,14 @@ public class PointSynchronizer extends AsyncTask<HashMap<HardwareAddress,Handler
     @Override
     public synchronized void addPointPacket(PointPacket pointPacket) {
         getPointPackets().add(pointPacket);
+        pointPacketsFromStart.add(pointPacket);
     }
 
-    private ArrayList<PointPacket> getPointPackets() {
+    public ArrayList<PointPacket> getPointPackets() {
         return pointPackets;
+    }
+    public ArrayList<PointPacket> getPointPacketsFromStart() {
+        return pointPacketsFromStart;
     }
 
     /**
